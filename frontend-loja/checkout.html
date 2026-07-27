@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout – Emily Bonanomi</title>
+<meta name="description" content="Finalize seu pedido com segurança via PIX.">
+<link rel="canonical" href="/checkout.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👗%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+.checkout-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin:24px 0}
+@media(max-width:768px){.checkout-grid{grid-template-columns:1fr}}
+.checkout-box{background:#fff;border-radius:10px;padding:18px 20px;margin-bottom:14px;box-shadow:0 3px 14px rgba(0,0,0,.06)}
+.checkout-box h2,.checkout-box h3{font-family:'Playfair Display',serif;margin:0 0 10px}
+.checkout-box label{display:block;padding:10px;border:1px solid #eee;border-radius:8px;margin:6px 0;cursor:pointer}
+.checkout-box label:hover{border-color:#c9a86a}
+.btn{background:#1a1a1a;color:#fff;border:0;padding:12px 26px;border-radius:8px;cursor:pointer;font-weight:600;letter-spacing:.5px}
+.btn.sec{background:#efe3d4;color:#1a1a1a}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:99}
+.modal .modal-inner{background:#fff;padding:24px;border-radius:12px;width:100%;max-width:520px;max-height:90vh;overflow:auto}
+.modal input{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+<div id="eb-topbar"></div>
+<div id="eb-header"></div>
+
+<main class="container">
+  <h1 style="font-family:'Playfair Display',serif">Finalizar Compra</h1>
+
+  <div class="checkout-grid">
+    <div>
+      <div class="checkout-box">
+        <h2>Endereço de entrega</h2>
+        <div id="enderecos"></div>
+        <button class="btn sec" onclick="abrirModalEndereco()">+ Novo endereço</button>
+      </div>
+    </div>
+
+    <div>
+      <div id="resumoPedido"></div>
+      <button id="btnFinalizar" class="btn" style="width:100%">Finalizar Compra</button>
+    </div>
+  </div>
+</main>
+
+<!-- Modal cadastro de endereço -->
+<div class="modal" id="modalEndereco">
+  <div class="modal-inner">
+    <h2 style="font-family:'Playfair Display',serif">Novo endereço</h2>
+    <input id="apelido"    placeholder="Apelido (ex: Casa)">
+    <input id="cep"        placeholder="CEP">
+    <input id="logradouro" placeholder="Rua / Avenida">
+    <div class="row">
+      <input id="numero"      placeholder="Número">
+      <input id="complemento" placeholder="Complemento">
+    </div>
+    <input id="bairro"     placeholder="Bairro">
+    <div class="row">
+      <input id="cidade" placeholder="Cidade">
+      <input id="estado" placeholder="UF" maxlength="2">
+    </div>
+    <div style="text-align:right;margin-top:12px">
+      <button class="btn sec" onclick="fecharModalEndereco()">Cancelar</button>
+      <button class="btn" onclick="salvarEndereco()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="eb-footer"></div>
+
+<script src="config.js"></script>
+<script src="partials.js"></script>
+<script src="checkout.js"></script>
+<script>
+function fecharModalEndereco(){document.getElementById('modalEndereco').style.display='none'}
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Produtos — Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</head>
+<body>
+<script>if(!guard()){throw 'x'} sidebar('produtos');</script>
+
+<main class="main">
+    <div class="topbar">
+        <h1>Produtos</h1>
+        <a href="produto-form.html" class="btn btn-beige">+ Novo produto</a>
+    </div>
+
+    <div class="card" style="padding:0">
+        <table>
+            <thead><tr>
+                <th>ID</th><th>Nome</th><th>Categoria</th><th>Preço</th>
+                <th>Estoque</th><th>Status</th><th style="width:280px">Ações</th>
+            </tr></thead>
+            <tbody id="tabela"><tr><td colspan="7">Carregando…</td></tr></tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+(async () => {
+    let produtos = [];
+    try { produtos = await api('/admin/products'); } catch { return; }
+    const tb = document.getElementById('tabela');
+    if (!produtos.length) { tb.innerHTML = '<tr><td colspan="7">Nenhum produto</td></tr>'; return; }
+
+    // Estoque total por produto (soma variações)
+    const totais = {};
+    await Promise.all(produtos.map(async p => {
+        try {
+            const vs = await api('/products/' + p.id + '/variations');
+            totais[p.id] = (vs || []).reduce((s,v) => s + Number(v.estoque||0), 0);
+        } catch { totais[p.id] = 0; }
+    }));
+
+    tb.innerHTML = produtos.map(p => `
+        <tr class="linha-produto" style="cursor:pointer" onclick="location.href='produto-admin.html?id=${p.id}'">
+
+            <td>${p.id}</td>
+            <td>${p.nome}</td>
+            <td>${p.categoria_nome || '<span style="color:#aaa">—</span>'}</td>
+            <td>${money(p.preco)}</td>
+            <td>${totais[p.id]}</td>
+            <td>${p.ativo ? '<span class="badge badge-green">Ativo</span>' : '<span class="badge badge-gray">Inativo</span>'}</td>
+            <td class="actions">
+                <!-- event.stopPropagation() adicionado nos links para evitar que o clique na linha seja disparado -->
+        <a href="editar-produto.html?id=${p.id}" class="btn btn-sm btn-outline" onclick="event.stopPropagation()">Editar</a>
+        <a href="produto-imagens.html?id=${p.id}" class="btn btn-sm btn-beige" onclick="event.stopPropagation()">Imagens</a>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); desativar(${p.id})">Desativar</button>
+            </td>
+        </tr>`).join('');
+})();
+
+async function desativar(id) {
+    if (!confirm('Desativar este produto?')) return;
+    try { await api('/admin/products/' + id, { method: 'DELETE' }); toast('Produto desativado'); setTimeout(() => location.reload(), 500); }
+    catch {}
+}
+window.desativar = desativar;
+</script>
+</body>
+</html>

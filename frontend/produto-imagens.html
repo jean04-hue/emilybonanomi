@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Imagens do produto — Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</head>
+<body>
+<script>if(!guard()){throw 'x'} sidebar('produtos');</script>
+
+<main class="main">
+    <div class="topbar">
+        <h1>Imagens do produto</h1>
+        <a id="voltar" class="btn btn-outline">← Voltar</a>
+    </div>
+
+    <div class="card">
+        <label>Enviar nova imagem (Cloudinary)</label>
+        <input type="file" id="arquivo" accept="image/*">
+        <div style="margin-top:12px">
+            <button class="btn btn-beige" onclick="enviar()">Enviar</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="font-size:16px;margin-bottom:8px">Galeria</h3>
+        <div class="img-grid" id="galeria"><p style="color:#999">Carregando…</p></div>
+    </div>
+</main>
+
+<script>
+const ID = qs('id');
+document.getElementById('voltar').href = 'editar-produto.html?id=' + ID;
+
+async function carregar() {
+    const box = document.getElementById('galeria');
+    try {
+        const imgs = await api('/products/' + ID + '/images');
+        if (!imgs.length) { box.innerHTML = '<p style="color:#999">Sem imagens ainda.</p>'; return; }
+        box.innerHTML = imgs.map(i => `
+            <div class="img-item ${i.principal?'principal':''}">
+                <img src="${i.url}" alt="">
+                <div class="img-body">
+                    <div style="font-size:11px;color:#7a7268;margin-bottom:6px">Ordem: ${i.ordem||0}</div>
+                    <button class="btn btn-sm btn-danger" onclick="excluir(${i.id})">Excluir</button>
+                </div>
+            </div>`).join('');
+    } catch { box.innerHTML = '<p style="color:#c62828">Erro ao carregar</p>'; }
+}
+async function enviar() {
+    const f = document.getElementById('arquivo').files[0];
+    if (!f) return toast('Selecione uma imagem', 'warning');
+    const fd = new FormData();
+    fd.append('imagem', f);
+    try { await api('/products/' + ID + '/images', { method:'POST', body: fd }); toast('Imagem enviada'); document.getElementById('arquivo').value=''; carregar(); }
+    catch {}
+}
+async function excluir(id) {
+    if (!confirm('Excluir imagem?')) return;
+    try { await api('/products/images/' + id, { method:'DELETE' }); toast('Removida'); carregar(); } catch {}
+}
+window.enviar = enviar; window.excluir = excluir;
+carregar();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+*** CRIAR ARQUIVO CMD ***
+type nul > src\models\order.model.js
+type nul > src\services\order.service.js
+type nul > src\controllers\order.controller.js
+type nul > src\routes\order.routes.js
+
+*** VISUALIZAR ARQUIVO CMD ***
+type src\models\order.model.js

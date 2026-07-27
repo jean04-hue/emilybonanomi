@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar ou Cadastrar – Emily Bonanomi</title>
+<meta name="description" content="Acesse sua conta ou crie um cadastro para comprar na Emily Bonanomi.">
+<link rel="canonical" href="/login-cliente.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👗%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Garantia absoluta de esconder formulário inativo */
+  form[hidden], .auth-form[hidden] {
+    display: none !important;
+  }
+
+  .auth-box {
+    max-width: 460px;
+    margin: 50px auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    padding: 35px 30px;
+    border: 1px solid #eaeaea;
+  }
+
+  .auth-tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 25px;
+  }
+
+  .auth-tabs .tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .auth-tabs .tab.ativo {
+    color: #2e7d32;
+    border-bottom: 3px solid #2e7d32;
+    margin-bottom: -2px;
+  }
+
+  .auth-form {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .auth-form h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #222;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .form-row input {
+    flex: 1;
+  }
+
+  .auth-form input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .auth-form input:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+  }
+
+  .auth-form .btn {
+    width: 100%;
+    padding: 13px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 5px;
+  }
+
+  .auth-form .btn:hover {
+    background: #236327;
+  }
+
+  .auth-form .btn:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+  }
+
+  .btn-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 13px;
+    text-align: center;
+    display: block;
+    margin-top: 14px;
+    transition: color 0.2s;
+  }
+
+  .btn-link:hover {
+    text-decoration: underline;
+    color: #2e7d32;
+  }
+</style>
+</head>
+<!-- MODAL RECUPERAÇÃO DE SENHA -->
+<div id="modalForgotPassword" class="modal-forgot">
+
+    <div class="modal-forgot-box">
+
+        <button
+            id="fecharModalForgot"
+            class="close-modal"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            🔒
+        </div>
+
+        <h2>
+            Recuperar senha
+        </h2>
+
+        <p>
+
+            Informe seu e-mail cadastrado.
+
+            <br>
+
+            Se existir uma conta, enviaremos um link para criar uma nova senha.
+
+        </p>
+
+        <form id="formForgotPassword">
+
+            <input
+                type="email"
+                id="emailForgot"
+                placeholder="Digite seu e-mail"
+                required
+            >
+
+            <button
+                type="submit"
+                class="btn"
+            >
+                Enviar e-mail
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+<body>
+<div id="eb-topbar"></div>
+<div id="eb-header"></div>
+
+<main class="container">
+  <div class="auth-box">
+    <!-- ABAS -->
+    <div class="auth-tabs">
+      <button type="button" class="tab ativo" data-tab="entrar">Entrar</button>
+      <button type="button" class="tab" data-tab="cadastrar">Cadastrar</button>
+    </div>
+
+    <!-- FORMULÁRIO DE LOGIN -->
+    <form id="formEntrar" class="auth-form">
+      <h2>Bem-vinda de volta!</h2>
+      <input type="email" name="email" placeholder="Seu e-mail" required autocomplete="email">
+      <input type="password" name="senha" placeholder="Sua senha" required autocomplete="current-password">
+      <button type="submit" class="btn">Entrar</button>
+      <a
+    href="#"
+    id="btnForgotPassword"
+    class="btn-link"
+>
+    Esqueci minha senha
+</a>
+    </form>
+
+    <!-- FORMULÁRIO DE CADASTRO -->
+    <form id="formCadastrar" class="auth-form" hidden>
+      <h2>Crie sua conta</h2>
+      
+      <div class="form-row">
+        <input type="text" name="nome" placeholder="Nome" required>
+        <input type="text" name="sobrenome" placeholder="Sobrenome" required>
+      </div>
+
+      <input type="text" name="cpf" placeholder="CPF" required>
+      <input type="email" name="email" placeholder="E-mail" required autocomplete="email">
+      <input type="text" name="telefone" placeholder="Telefone / WhatsApp">
+      <input type="password" name="senha" placeholder="Crie uma senha (mín. 6)" minlength="6" required autocomplete="new-password">
+      
+      <button type="submit" class="btn">Criar conta</button>
+    </form>
+  </div>
+</main>
+
+<div id="eb-footer"></div>
+
+<script src="config.js"></script>
+<script src="partials.js"></script>
+<script src="login-cliente.js"></script>
+</body>
+</html>

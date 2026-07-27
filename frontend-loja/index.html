@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emily Bonanomi – Moda Feminina com Elegância</title>
+<meta name="description" content="Loja oficial Emily Bonanomi. Vestidos, blusas, calças e acessórios com entrega para todo o Brasil.">
+<meta property="og:title" content="Emily Bonanomi – Moda Feminina com Elegância">
+<meta property="og:description" content="Loja oficial Emily Bonanomi. Vestidos, blusas, calças e acessórios com entrega para todo o Brasil.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👗%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="eb-topbar"></div>
+<div id="eb-header"></div>
+
+<section class="hero" id="hero">
+  <div class="hero-texto">
+    <span id="heroCategoria">Coleção Exclusiva</span>
+    <h1 id="heroTitulo">Estilo que<br>te representa</h1>
+    <p id="heroDescricao">Peças selecionadas com carinho para cada momento seu.</p>
+    <a href="#produtos" class="btn">Ver Novidades</a>
+  </div>
+  <div class="hero-imagem">
+    <img id="heroImagem" src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=1200" alt="Emily Bonanomi">
+  </div>
+</section>
+
+<section id="categorias" class="categorias">
+  <h2 class="titulo-secao">Nossos Produtos</h2>
+  <div id="listaCategorias" class="categorias-grid"></div>
+</section>
+
+<section class="barra-filtros">
+  <div id="breadcrumb" class="breadcrumb">Home</div>
+  <div class="filtros">
+    <input type="text" id="buscaProduto" placeholder="Pesquisar produtos...">
+    <select id="ordenacao">
+      <option value="recentes">Mais recentes</option>
+      <option value="menor">Menor preço</option>
+      <option value="maior">Maior preço</option>
+      <option value="az">A → Z</option>
+      <option value="za">Z → A</option>
+    </select>
+  </div>
+</section>
+
+<section class="produtos-home">
+  <div id="produtos" class="grid-produtos"></div>
+</section>
+
+<div id="eb-footer"></div>
+
+<script src="config.js"></script>
+<script src="partials.js"></script>
+<script src="index.js"></script>
+</body>
+</html>

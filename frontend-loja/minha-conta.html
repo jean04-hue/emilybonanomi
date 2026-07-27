@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha Conta – Emily Bonanomi</title>
+<meta name="description" content="Gerencie seus dados, endereços e preferências na Emily Bonanomi.">
+<link rel="stylesheet" href="style.css">
+<style>
+/* --- ESTILOS EXCLUSIVOS DOS PAINÉIS AVANÇADOS --- */
+.painel-conta {
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.02);
+}
+
+.painel-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.btn-voltar {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #111111;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-voltar:hover {
+    background: #f5f5f5;
+}
+
+.painel-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: #111111;
+}
+
+/* Avisos LGPD & Informações de Privacidade */
+.aviso-privacidade {
+    background: #f9f9fb;
+    border: 1px solid #e8e8ed;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #555555;
+    line-height: 1.5;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.aviso-privacidade svg {
+    width: 20px;
+    height: 20px;
+    stroke: #222222;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Formulários Avançados */
+.form-grid-avancado {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.form-group-full {
+    grid-column: span 2;
+}
+
+.form-group-custom label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #444444;
+    margin-bottom: 6px;
+}
+
+.form-group-custom input,
+.form-group-custom select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #111111;
+    background: #ffffff;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group-custom input:focus,
+.form-group-custom select:focus {
+    border-color: #111111;
+}
+
+/* Checkbox Consentimento */
+.checkbox-consentimento {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 20px 0;
+    font-size: 13px;
+    color: #444444;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.checkbox-consentimento input {
+    margin-top: 3px;
+    accent-color: #111111;
+    width: 16px;
+    height: 16px;
+}
+
+/* Botoes Padrão */
+.btn-primary-black {
+    background: #111111;
+    color: #ffffff;
+    border: none;
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-primary-black:hover {
+    background: #333333;
+}
+
+.btn-outline-black {
+    background: transparent;
+    color: #111111;
+    border: 1px solid #111111;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-outline-black:hover {
+    background: #111111;
+    color: #ffffff;
+}
+
+/* Lista de Cards de Endereço */
+.grid-enderecos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.card-endereco {
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 20px;
+    background: #ffffff;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card-endereco:hover {
+    border-color: #111111;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.card-endereco .badge-tipo {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #333333;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.card-endereco h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #111111;
+}
+
+.card-endereco p {
+    font-size: 13px;
+    color: #666666;
+    margin: 3px 0;
+    line-height: 1.4;
+}
+
+.card-endereco .btn-deletar {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 14px;
+    display: inline-block;
+    transition: opacity 0.2s;
+}
+
+.card-endereco .btn-deletar:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .form-grid-avancado {
+        grid-template-columns: 1fr;
+    }
+    .form-group-full {
+        grid-column: span 1;
+    }
+}
+</style>
+</head>
+<body>
+<div id="eb-topbar"></div>
+<div id="eb-header"></div>
+
+<main class="container">
+  <h1 style="font-size: 26px; font-weight: 500; margin-bottom: 24px; text-align: center; letter-spacing: -0.5px;">Minha Conta</h1>
+
+  <section class="conta-app">
+
+    <!-- CARD DO PERFIL DO USUÁRIO -->
+    <div class="conta-topo">
+      <div class="avatar" id="avatarUsuario">--</div>
+      <div>
+        <h2 id="nomeUsuario">Carregando...</h2>
+        <p id="emailUsuario">...</p>
+        <small id="clienteDesde"></small>
+      </div>
+    </div>
+
+    <!-- LISTA PRINCIPAL DE NAVEGAÇÃO DA CONTA -->
+    <div class="lista-conta" id="listaConta">
+
+      <a href="#" id="abrirEnderecos">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Endereços Cadastrados
+        </span>
+        <span class="seta-link">›</span>
+      </a>
+
+      <a href="#" id="abrirTelefone">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          Número de Telefone
+        </span>
+        <span class="item-valor" id="telefoneUsuario">Adicionar</span>
+      </a>
+
+      <a href="#">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          E-mail de Cadastro
+        </span>
+        <span class="item-valor" id="emailResumo"></span>
+      </a>
+
+      <a href="alterar-senha.html">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Segurança e Senha
+        </span>
+        <span class="seta-link">›</span>
+      </a>
+
+      <a href="favoritos.html">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Meus Favoritos
+        </span>
+        <span class="seta-link">›</span>
+      </a>
+
+      <a href="meus-pedidos.html">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Meus Pedidos
+        </span>
+        <span class="seta-link">›</span>
+      </a>
+
+      <hr>
+
+      <a href="#" id="abrirConecte">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Central de Atendimento
+        </span>
+        <span class="seta-link">›</span>
+      </a>
+
+      <a href="#" id="abrirSobre">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Sobre Emily Bonanomi
+        </span>
+        <span class="seta-link">›</span>
+      </a>
+
+      <a href="#" id="logoutConta" class="link-logout">
+        <span class="item-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair da Conta
+        </span>
+      </a>
+
+    </div>
+
+    <!-- SUBPAINEL DE ENDEREÇOS -->
+    <div id="painelEnderecos" class="painel-conta" style="display:none;">
+      <div class="painel-header">
+        <button class="btn-voltar" id="voltarContaEnderecos" aria-label="Voltar">←</button>
+        <h2>Meus Endereços</h2>
+      </div>
+
+      <div class="aviso-privacidade">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>
+          Gerencie seus endereços de entrega para um processo de finalização de compra mais rápido e seguro. Seus dados estão protegidos sob nossa Política de Privacidade.
+        </div>
+      </div>
+
+      <!-- LISTA DE CARDS -->
+      <div id="lista-enderecos" class="grid-enderecos"></div>
+
+      <!-- FORMULÁRIO DE NOVO ENDEREÇO (INICIALMENTE OCULTO) -->
+      <div id="formNovoEnderecoContainer" style="display:none; margin-top:20px; padding-top:20px; border-top:1px dashed #e0e0e0;">
+        <h3 style="font-size: 16px; margin-bottom: 16px; color:#111;">Cadastrar Novo Endereço</h3>
+        
+        <form id="formNovoEndereco" class="form-grid-avancado">
+          <div class="form-group-custom">
+            <label for="endApelido">Identificação (ex: Casa, Trabalho)</label>
+            <input type="text" id="endApelido" placeholder="Ex: Minha Casa" required>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="endCep">CEP</label>
+            <input type="text" id="endCep" maxlength="9" placeholder="00000-000" required>
+          </div>
+
+          <div class="form-group-custom form-group-full">
+            <label for="endLogradouro">Rua / Avenida</label>
+            <input type="text" id="endLogradouro" placeholder="Endereço da rua" required>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="endNumero">Número</label>
+            <input type="text" id="endNumero" placeholder="123" required>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="endComplemento">Complemento (Opcional)</label>
+            <input type="text" id="endComplemento" placeholder="Apto 42, Bloco B">
+          </div>
+
+          <div class="form-group-custom">
+            <label for="endBairro">Bairro</label>
+            <input type="text" id="endBairro" placeholder="Seu bairro" required>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="endCidade">Cidade</label>
+            <input type="text" id="endCidade" placeholder="Sua cidade" required>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="endUf">Estado (UF)</label>
+            <input type="text" id="endUf" maxlength="2" placeholder="SP" style="text-transform:uppercase" required>
+          </div>
+
+          <div class="form-group-full" style="display:flex; gap:12px; margin-top:10px;">
+            <button type="submit" class="btn-primary-black" id="btnSalvarEndereco">Salvar Endereço</button>
+            <button type="button" class="btn-outline-black" id="btnCancelarEndereco">Cancelar</button>
+          </div>
+        </form>
+      </div>
+
+      <button class="btn-outline-black" id="btnAbrirFormEndereco" style="margin-top: 10px;">
+        + Adicionar Novo Endereço
+      </button>
+    </div>
+
+    <!-- SUBPAINEL DE TELEFONE -->
+    <div id="painelTelefone" class="painel-conta" style="display:none;">
+      <div class="painel-header">
+        <button class="btn-voltar" id="voltarTelefone" aria-label="Voltar">←</button>
+        <h2>Número de Contato</h2>
+      </div>
+
+      <div class="aviso-privacidade">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div>
+          <strong>Por que pedimos seu telefone?</strong><br>
+          Usamos seu contato exclusivamente para enviar notificações importantes sobre o transporte e rastreamento do seu pedido via SMS ou WhatsApp. Nunca compartilhamos seus dados com terceiros.
+        </div>
+      </div>
+
+      <form id="formTelefone">
+        <div class="form-group-custom" style="margin-bottom: 20px;">
+            <label for="telefoneInput">Número de Celular / WhatsApp</label>
+            <input type="tel" id="telefoneInput" placeholder="(11) 99999-9999" maxlength="15" required>
+        </div>
+
+        <label class="checkbox-consentimento">
+            <input type="checkbox" id="consentimentoSms" checked required>
+            <span>Concordo em receber atualizações sobre o status das minhas compras e notificações de entrega via WhatsApp e SMS.</span>
+        </label>
+
+        <button type="submit" class="btn-primary-black" id="salvarTelefone">
+            Salvar Telefone
+        </button>
+      </form>
+    </div>
+
+    <div id="painelConecte" class="painel-conta" style="display:none;">
+    <div class="painel-header">
+        <button id="voltarConecte" class="btn-voltar" aria-label="Voltar">←</button>
+        <h2>Conecte-se conosco</h2>
+    </div>
+
+    <div class="aviso-privacidade">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <div>
+            Escolha o canal de sua preferência. Nossa equipe de atendimento está disponível de **Segunda a Sexta, das 09h às 18h**.
+        </div>
+    </div>
+
+    <div class="conta-links-redes">
+        <!-- WhatsApp -->
+        <a href="https://wa.me/5511994557696" target="_blank" rel="noopener noreferrer" class="link-rede">
+            <div class="rede-info">
+                <svg class="rede-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+                <div class="rede-texto">
+                    <strong>WhatsApp</strong>
+                    <span>Atendimento rápido e suporte a pedidos</span>
+                </div>
+            </div>
+            <span class="seta-link">›</span>
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://instagram.com/emily_bonanomi" target="_blank" rel="noopener noreferrer" class="link-rede">
+            <div class="rede-info">
+                <svg class="rede-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+                <div class="rede-texto">
+                    <strong>Instagram</strong>
+                    <span>@emily_bonanomi • Bastidores e novidades</span>
+                </div>
+            </div>
+            <span class="seta-link">›</span>
+        </a>
+
+        <!-- E-mail -->
+        <a href="mailto:contato@emilybonanomi.com.br" class="link-rede">
+            <div class="rede-info">
+                <svg class="rede-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <div class="rede-texto">
+                    <strong>E-mail</strong>
+                    <span>contato@emilybonanomi.com.br</span>
+                </div>
+            </div>
+            <span class="seta-link">›</span>
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" class="link-rede">
+            <div class="rede-info">
+                <svg class="rede-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
+                <div class="rede-texto">
+                    <strong>Facebook</strong>
+                    <span>Página oficial da marca</span>
+                </div>
+            </div>
+            <span class="seta-link">›</span>
+        </a>
+    </div>
+</div>
+
+<div id="painelSobre" class="painel-conta" style="display:none;">
+    <div class="painel-header">
+        <button id="voltarSobre" class="btn-voltar" aria-label="Voltar">←</button>
+        <h2>Sobre a Marca</h2>
+    </div>
+
+    <article class="sobre-loja">
+        <!-- Frame para imagem/banner com efeito de proporção elegante -->
+        <div class="sobre-banner-frame">
+            <img src="https://res.cloudinary.com/dldalhol8/image/upload/v1784922569/35d8c4fe-46cf-4075-b3dd-8d80151bb146_bbw5zd.png" alt="Emily Bonanomi " class="sobre-banner">
+        </div>
+
+        <div class="sobre-conteudo">
+            <span class="sobre-tagline">Nossa Essência</span>
+            <h3 class="sobre-titulo">Moda feminina autoral, elegante e atemporal.</h3>
+
+            <p class="sobre-texto">
+                A <strong>Emily Bonanomi</strong> nasceu do desejo de traduzir a sofisticação contemporânea em peças indispensáveis. Desenvolvemos coleções pensadas para a mulher moderna, que busca expressar sua personalidade com elegância, sem abrir mão do conforto e do acabamento impecável.
+            </p>
+
+            <p class="sobre-texto">
+                Com curadoria minuciosa e processos alinhados aos mais altos padrões de qualidade, priorizamos matérias-primas nobres e cortes estruturados que atravessam estações.
+            </p>
+
+            <!-- Grid de Pilares / Diferenciais de Mercado -->
+            <div class="sobre-pilares">
+                <div class="pilar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <strong>Design Exclusivo</strong>
+                </div>
+                <div class="pilar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <strong>Compra Segura</strong>
+                </div>
+                <div class="pilar-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    <strong>Entrega Garantida</strong>
+                </div>
+            </div>
+
+            <a href="institucional.html" class="btn-primary-black btn-sobre-link">
+                Conheça Nossa História Completa
+            </a>
+        </div>
+    </article>
+</div>
+
+  </section>
+</main>
+
+<div id="eb-footer"></div>
+
+<script src="config.js"></script>
+<script src="partials.js"></script>
+
+<script>
+// --- FUNÇÃO PARA CARREGAR ENDEREÇOS ---
+async function carregarEnderecos() {
+    const container = document.getElementById('lista-enderecos');
+    try {
+        const enderecos = await api('/addresses');
+
+        if (!enderecos || enderecos.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #777;">
+                    <p style="margin-bottom: 12px;">Você ainda não possui nenhum endereço cadastrado.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = enderecos.map(e => `
+            <div class="card-endereco">
+                <span class="badge-tipo">${e.apelido || 'Endereço'}</span>
+                <h3>${e.logradouro}, ${e.numero}</h3>
+                ${e.complemento ? `<p>${e.complemento}</p>` : ''}
+                <p>${e.bairro}</p>
+                <p>${e.cidade} / ${e.uf}</p>
+                <p style="font-weight: 500; margin-top: 4px;">CEP: ${e.cep}</p>
+                <button class="btn-deletar" onclick="removerEndereco(${e.id})">Remover endereço</button>
+            </div>
+        `).join('');
+
+    } catch (e) {
+        if (window.toast) toast(e.message, 'erro');
+        else alert(e.message);
+    }
+}
+
+// --- FUNÇÃO PARA REMOVER ENDEREÇO ---
+async function removerEndereco(id) {
+    if (!confirm('Deseja realmente remover este endereço?')) return;
+    try {
+        await api(`/addresses/${id}`, { method: 'DELETE' });
+        if (window.toast) toast('Endereço removido com sucesso!');
+        carregarEnderecos();
+    } catch (e) {
+        if (window.toast) toast(e.message, 'erro');
+        else alert(e.message);
+    }
+}
+
+if (exigirLogin()) (async () => {
+    try {
+        const perfil = await api('/profile');
+
+        document.getElementById('nomeUsuario').innerText =
+            perfil.nome + ' ' + (perfil.sobrenome || '');
+
+        document.getElementById('emailUsuario').innerText = perfil.email;
+        document.getElementById('emailResumo').innerText = perfil.email;
+        document.getElementById('telefoneUsuario').innerText = perfil.telefone || 'Adicionar';
+
+        document.getElementById('avatarUsuario').innerText =
+            (perfil.nome.charAt(0) + (perfil.sobrenome ? perfil.sobrenome.charAt(0) : '')).toUpperCase();
+
+        if (perfil.created_at) {
+            const data = new Date(perfil.created_at);
+            document.getElementById('clienteDesde').innerText =
+                'Cliente desde ' + data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        }
+
+    } catch (e) {
+        if (window.toast) toast(e.message, 'erro');
+    }
+
+    // --- MÁSCARA AUTOMÁTICA DE TELEFONE ---
+    const telInput = document.getElementById('telefoneInput');
+    telInput.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '');
+        v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+        v = v.replace(/(\d)(\d{4})$/, '$1-$2');
+        e.target.value = v;
+    });
+
+    // --- MÁSCARA & BUSCA VIA CEP AUTOMÁTICA ---
+    const cepInput = document.getElementById('endCep');
+    cepInput.addEventListener('input', async (e) => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 5) v = v.replace(/^(\d{5})(\d)/, '$1-$2');
+        e.target.value = v;
+
+        if (v.replace(/\D/g, '').length === 8) {
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${v.replace(/\D/g, '')}/json/`);
+                const data = await res.json();
+                if (!data.erro) {
+                    document.getElementById('endLogradouro').value = data.logradouro || '';
+                    document.getElementById('endBairro').value = data.bairro || '';
+                    document.getElementById('endCidade').value = data.localidade || '';
+                    document.getElementById('endUf').value = data.uf || '';
+                    document.getElementById('endNumero').focus();
+                }
+            } catch (err) { /* Falha silenciosa no autocomplete */ }
+        }
+    });
+
+    // --- LOGOUT ---
+    document.getElementById('logoutConta').onclick = function (e) {
+        e.preventDefault();
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        location.href = 'index.html';
+    };
+
+    // --- CONTROLADOR DE NAVEGAÇÃO ENTRE PAINÉIS (SPA) ---
+    const lista = document.getElementById('listaConta');
+    const painelEnderecos = document.getElementById('painelEnderecos');
+    const painelTelefone = document.getElementById('painelTelefone');
+
+    // Abrir Endereços
+    document.getElementById('abrirEnderecos').onclick = function (e) {
+        e.preventDefault();
+        lista.style.display = 'none';
+        painelEnderecos.style.display = 'block';
+        carregarEnderecos();
+    };
+
+    document.getElementById('voltarContaEnderecos').onclick = function () {
+        painelEnderecos.style.display = 'none';
+        lista.style.display = 'block';
+    };
+
+    // Form de endereço
+    const formEndContainer = document.getElementById('formNovoEnderecoContainer');
+    const btnAbrirForm = document.getElementById('btnAbrirFormEndereco');
+
+    btnAbrirForm.onclick = () => {
+        formEndContainer.style.display = 'block';
+        btnAbrirForm.style.display = 'none';
+    };
+
+    document.getElementById('btnCancelarEndereco').onclick = () => {
+        formEndContainer.style.display = 'none';
+        btnAbrirForm.style.display = 'block';
+        document.getElementById('formNovoEndereco').reset();
+    };
+
+    document.getElementById('formNovoEndereco').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnSalvarEndereco');
+        
+        const payload = {
+            apelido: document.getElementById('endApelido').value,
+            cep: document.getElementById('endCep').value,
+            logradouro: document.getElementById('endLogradouro').value,
+            numero: document.getElementById('endNumero').value,
+            complemento: document.getElementById('endComplemento').value,
+            bairro: document.getElementById('endBairro').value,
+            cidade: document.getElementById('endCidade').value,
+            uf: document.getElementById('endUf').value
+        };
+
+        try {
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+            await api('/addresses', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            if (window.toast) toast('Endereço cadastrado com sucesso!');
+            document.getElementById('formNovoEndereco').reset();
+            formEndContainer.style.display = 'none';
+            btnAbrirForm.style.display = 'block';
+            carregarEnderecos();
+        } catch (err) {
+            if (window.toast) toast(err.message, 'erro');
+            else alert(err.message);
+        } finally {
+            btn.innerText = 'Salvar Endereço';
+            btn.disabled = false;
+        }
+    };
+
+    // Abrir Telefone
+    document.getElementById('abrirTelefone').onclick = function (e) {
+        e.preventDefault();
+        lista.style.display = 'none';
+        painelTelefone.style.display = 'block';
+
+        const telAtual = document.getElementById('telefoneUsuario').innerText;
+        document.getElementById('telefoneInput').value = telAtual === 'Adicionar' ? '' : telAtual;
+    };
+
+    document.getElementById('voltarTelefone').onclick = function () {
+        painelTelefone.style.display = 'none';
+        lista.style.display = 'block';
+    };
+
+    // Salvar Telefone
+    document.getElementById('formTelefone').onsubmit = async function (e) {
+        e.preventDefault();
+        const telefone = document.getElementById('telefoneInput').value.trim();
+        const btn = document.getElementById('salvarTelefone');
+
+        if (!telefone) {
+            if (window.toast) toast('Informe um número de telefone válido.', 'erro');
+            return;
+        }
+
+        try {
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+
+            const perfil = await api('/profile');
+
+            await api('/profile', {
+                method: 'PUT',
+                body: JSON.stringify({
+                    nome: perfil.nome,
+                    sobrenome: perfil.sobrenome,
+                    telefone
+                })
+            });
+
+            document.getElementById('telefoneUsuario').innerText = telefone;
+            if (window.toast) toast('Telefone atualizado com sucesso!');
+
+            painelTelefone.style.display = 'none';
+            lista.style.display = 'block';
+
+        } catch (err) {
+            if (window.toast) toast(err.message, 'erro');
+            else alert(err.message);
+        } finally {
+            btn.innerText = 'Salvar Telefone';
+            btn.disabled = false;
+        }
+    };
+
+    //----------------------------------------------------
+// CONECTE-SE
+//----------------------------------------------------
+
+const painelConecte =
+    document.getElementById('painelConecte');
+
+document.getElementById('abrirConecte').onclick = function(e){
+
+    e.preventDefault();
+
+    lista.style.display='none';
+
+    painelConecte.style.display='block';
+
+};
+
+document.getElementById('voltarConecte').onclick = function(){
+
+    painelConecte.style.display='none';
+
+    lista.style.display='block';
+
+};
+
+//----------------------------------------------------
+// SOBRE A LOJA
+//----------------------------------------------------
+
+const painelSobre =
+    document.getElementById('painelSobre');
+
+document.getElementById('abrirSobre').onclick = function(e){
+
+    e.preventDefault();
+
+    lista.style.display='none';
+
+    painelSobre.style.display='block';
+
+};
+
+document.getElementById('voltarSobre').onclick = function(){
+
+    painelSobre.style.display='none';
+
+    lista.style.display='block';
+
+};
+
+})();
+</script>
+</body>
+</html>

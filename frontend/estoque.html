@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Estoque — Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="config.js"></script><script src="admin.js"></script>
+</head>
+<body>
+<script>if(!guard()){throw 'x'} sidebar('estoque');</script>
+
+<main class="main">
+    <div class="topbar"><h1>Estoque</h1><span style="color:#7a7268;font-size:13px">Edite direto na tabela e clique em Salvar.</span></div>
+    <div id="wrap"><p style="color:#999">Carregando…</p></div>
+</main>
+
+<script>
+(async () => {
+    let produtos = [];
+    try { produtos = await api('/admin/products'); } catch { return; }
+    const box = document.getElementById('wrap');
+    box.innerHTML = '';
+
+    for (const p of produtos) {
+        let vs = [];
+        try { vs = await api('/products/' + p.id + '/variations'); } catch {}
+        const html = `
+            <div class="card">
+                <h3 style="font-size:15px;margin-bottom:8px">${p.nome} <span style="color:#999;font-size:12px">#${p.id}</span></h3>
+                ${vs.length ? `
+                <table>
+                    <thead><tr><th>Cor</th><th>Tamanho</th><th style="width:150px">Estoque</th><th style="width:100px"></th></tr></thead>
+                    <tbody>
+                        ${vs.map(v => `
+                            <tr data-vid="${v.id}">
+                                <td>${v.cor||'-'}</td>
+                                <td>${v.tamanho||'-'}</td>
+                                <td><input type="number" min="0" value="${v.estoque||0}" style="width:120px"></td>
+                                <td><button class="btn btn-sm" onclick="salvar(this)">Salvar</button></td>
+                            </tr>`).join('')}
+                    </tbody>
+                </table>` : '<p style="color:#aaa">Sem variações cadastradas.</p>'}
+            </div>`;
+        box.insertAdjacentHTML('beforeend', html);
+    }
+})();
+
+async function salvar(btn) {
+    const tr = btn.closest('tr');
+    const vid = tr.dataset.vid;
+    const est = parseInt(tr.querySelector('input').value, 10) || 0;
+    try { await api('/products/variations/' + vid, { method:'PUT', body:{ estoque: est } }); toast('Estoque atualizado'); }
+    catch {}
+}
+window.salvar = salvar;
+</script>
+</body></html>

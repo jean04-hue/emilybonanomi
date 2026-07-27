@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes / Editar Cliente</title>
+    <link rel="stylesheet" href="admin.css"> <!-- Seus estilos do admin -->
+</head>
+<body>
+    <div class="container">
+        <a href="clientes.html">&larr; Voltar para Clientes</a>
+        <h1 id="tituloCliente">Carregando cliente...</h1>
+
+        <div class="acoes-topo" style="margin-bottom: 20px;">
+            <button id="btnToggleAtivo" class="btn">Carregando...</button>
+            <button id="btnResetSenha" class="btn btn-warning">🔑 Redefinir Senha Temporária</button>
+        </div>
+
+        <!-- BOX SENHA TEMPORÁRIA GERADA -->
+        <div id="boxSenhaGerada" class="card" style="display:none; background: #e8f5e9; border: 1px solid #4caf50; margin-bottom: 20px; padding: 15px;">
+            <h3>🔑 Senha Temporária Gerada!</h3>
+            <p>Copie ou envie esta senha por e-mail para o cliente. Ao fazer login, ele será solicitado a criar uma nova senha.</p>
+            
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                <div style="font-size: 20px; font-weight: bold; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" id="textoSenhaGerada"></div>
+                
+                <!-- BOTÃO COPIAR -->
+                <button type="button" id="btnCopiarSenha" class="btn btn-sm">📋 Copiar Senha</button>
+                
+            </div>
+        </div>
+
+        <form id="formCliente">
+            <!-- 👤 DADOS PESSOAIS -->
+            <div class="card" style="margin-bottom: 20px;">
+                <h2>👤 Dados Pessoais</h2>
+                <div class="form-group">
+                    <label>Nome:</label>
+                    <input type="text" id="nome" required>
+                </div>
+                <div class="form-group">
+                    <label>Sobrenome:</label>
+                    <input type="text" id="sobrenome" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail (Não editável):</label>
+                    <input type="email" id="email" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Telefone:</label>
+                    <input type="text" id="telefone">
+                </div>
+                <div class="form-group">
+                    <label>Status da Senha:</label>
+                    <span id="statusSenha"></span>
+                </div>
+            </div>
+
+            <!-- 📍 ENDEREÇO -->
+            <div class="card" style="margin-bottom: 20px;">
+                <h2>📍 Endereço</h2>
+                <div class="form-group">
+                    <label>CEP:</label>
+                    <input type="text" id="cep" placeholder="00000-000">
+                </div>
+                <div class="form-group">
+                    <label>Logradouro (Rua/Avenida):</label>
+                    <input type="text" id="logradouro">
+                </div>
+                <div class="form-group">
+                    <label>Número:</label>
+                    <input type="text" id="numero">
+                </div>
+                <div class="form-group">
+                    <label>Complemento:</label>
+                    <input type="text" id="complemento">
+                </div>
+                <div class="form-group">
+                    <label>Bairro:</label>
+                    <input type="text" id="bairro">
+                </div>
+                <div class="form-group">
+                    <label>Cidade:</label>
+                    <input type="text" id="cidade">
+                </div>
+                <div class="form-group">
+                    <label>Estado (UF):</label>
+                    <input type="text" id="estado" maxlength="2">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
+        </form>
+
+        <!-- 🛒 HISTÓRICO DE PEDIDOS -->
+        <div class="card" style="margin-top: 20px;">
+            <h2>🛒 Histórico de Pedidos</h2>
+            <div id="resumoPedidos"></div>
+            <table width="100%" border="1" style="margin-top: 10px; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaPedidos"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+    <script src="editar-cliente.js"></script>
+    
+</body>
+</html>

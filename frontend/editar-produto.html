@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Editar produto — Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</head>
+<body>
+<script>if(!guard()){throw 'x'} sidebar('produtos');</script>
+
+<main class="main">
+    <div class="topbar">
+        <h1>Editar produto</h1>
+        <div>
+            <a id="linkImgs" class="btn btn-beige">Gerenciar imagens</a>
+            <a href="produtos.html" class="btn btn-outline">← Voltar</a>
+        </div>
+    </div>
+
+    <form id="form" class="card">
+        <div class="form-row">
+            <div><label>Nome</label><input id="nome" required></div>
+            <div><label>Marca</label><input id="marca"></div>
+            <div><label>Preço</label><input id="preco" type="number" step="0.01" required></div>
+            <div><label>Preço promocional</label><input id="preco_promocional" type="number" step="0.01"></div>
+            <div><label>Categoria</label><select id="categoria"></select></div>
+        </div>
+        <label>Descrição</label>
+        <textarea id="descricao"></textarea>
+        <label>Tabela de medidas</label>
+        <textarea id="tabela_medidas"></textarea>
+        <div class="check"><input type="checkbox" id="ativo"> <label for="ativo" style="margin:0">Produto ativo (visível na loja)</label></div>
+        <div style="margin-top:16px"><button type="submit" class="btn btn-beige">Salvar alterações</button></div>
+    </form>
+
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h3 style="font-size:16px">Variações (cor · tamanho · estoque)</h3>
+            <button class="btn btn-sm btn-beige" onclick="addVarUI()">+ Nova variação</button>
+        </div>
+        <div id="listaVars"></div>
+    </div>
+</main>
+
+<script>
+const ID = qs('id');
+document.getElementById('linkImgs').href = 'produto-imagens.html?id=' + ID;
+
+async function carregar() {
+    try {
+        const p = await api('/products/' + ID);
+        document.getElementById('nome').value = p.nome || '';
+        document.getElementById('marca').value = p.marca || '';
+        document.getElementById('preco').value = p.preco || '';
+        document.getElementById('preco_promocional').value = p.preco_promocional || '';
+        document.getElementById('descricao').value = p.descricao || '';
+        document.getElementById('tabela_medidas').value = p.tabela_medidas || '';
+        document.getElementById('ativo').checked = !!p.ativo;
+
+        const cats = await api('/admin/categories');
+        document.getElementById('categoria').innerHTML =
+            cats.map(c => `<option value="${c.id}" ${c.id==p.categoria_id?'selected':''}>${c.nome}</option>`).join('');
+    } catch {}
+    carregarVars();
+}
+
+async function carregarVars() {
+    const box = document.getElementById('listaVars');
+    try {
+        const vs = await api('/products/' + ID + '/variations');
+        box.innerHTML = (vs || []).map(v => rowVar(v)).join('') || '<p style="color:#999">Sem variações. Crie ao menos uma para vender.</p>';
+    } catch {}
+}
+function rowVar(v) {
+    return `
+    <div class="var-row" data-id="${v.id||''}">
+        <input placeholder="Cor" value="${v.cor||''}">
+        <input placeholder="Tamanho" value="${v.tamanho||''}">
+        <input placeholder="Estoque" type="number" min="0" value="${v.estoque||0}">
+        <div class="actions">
+            <button class="btn btn-sm" onclick="salvarVar(this)">Salvar</button>
+            ${v.id ? `<button class="btn btn-sm btn-danger" onclick="delVar(this)">×</button>` : ''}
+        </div>
+    </div>`;
+}
+function addVarUI() {
+    document.getElementById('listaVars').insertAdjacentHTML('beforeend', rowVar({}));
+}
+async function salvarVar(btn) {
+    const row = btn.closest('.var-row');
+    const [cor,tam,est] = row.querySelectorAll('input');
+    const body = { cor: cor.value, tamanho: tam.value, estoque: parseInt(est.value,10) || 0 };
+    const id = row.dataset.id;
+    try {
+        if (id) await api('/products/variations/' + id, { method:'PUT', body });
+        else    await api('/products/' + ID + '/variations', { method:'POST', body });
+        toast('Variação salva');
+        carregarVars();
+    } catch {}
+}
+async function delVar(btn) {
+    const row = btn.closest('.var-row');
+    if (!confirm('Excluir variação?')) return;
+    try { await api('/products/variations/' + row.dataset.id, { method:'DELETE' }); toast('Removida'); carregarVars(); }
+    catch {}
+}
+window.addVarUI = addVarUI; window.salvarVar = salvarVar; window.delVar = delVar;
+
+document.getElementById('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = {
+        nome:  document.getElementById('nome').value,
+        marca: document.getElementById('marca').value,
+        preco: parseFloat(document.getElementById('preco').value),
+        preco_promocional: parseFloat(document.getElementById('preco_promocional').value) || null,
+        descricao: document.getElementById('descricao').value,
+        tabela_medidas: document.getElementById('tabela_medidas').value,
+        categoria_id: parseInt(document.getElementById('categoria').value,10),
+        ativo: document.getElementById('ativo').checked
+    };
+    try { await api('/admin/products/' + ID, { method:'PUT', body }); toast('Produto atualizado'); }
+    catch {}
+});
+
+carregar();
+</script>
+</body>
+</html>

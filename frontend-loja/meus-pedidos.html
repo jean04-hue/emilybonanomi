@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus Pedidos – Emily Bonanomi</title>
+<meta name="description" content="Acompanhe o status dos seus pedidos na Emily Bonanomi.">
+<meta property="og:title" content="Meus Pedidos – Emily Bonanomi">
+<meta property="og:description" content="Acompanhe o status dos seus pedidos na Emily Bonanomi.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="/meus-pedidos.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="/meus-pedidos.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👗%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="eb-topbar"></div>
+<div id="eb-header"></div>
+
+<main class="container">
+  <h1>Meus pedidos</h1>
+  <div class="tabs-conta">
+    <a href="minha-conta.html">Dados</a>
+    <a href="meus-pedidos.html" class="ativo">Pedidos</a>
+    <a href="favoritos.html">Favoritos</a>
+    <a href="#" onclick="localStorage.clear();location.href='index.html';return false">Sair</a>
+  </div>
+  <div id="pedidos"></div>
+</main>
+
+<div id="eb-footer"></div>
+
+<script src="config.js"></script>
+<script src="partials.js"></script>
+<script>
+if (exigirLogin()) (async () => {
+
+    try {
+
+        const pedidos = await api('/orders');
+
+        if (!pedidos.length) {
+
+            document.getElementById('pedidos').innerHTML = `
+                <p style="text-align:center;padding:40px">
+                    Você ainda não fez pedidos.
+                </p>
+            `;
+
+            return;
+        }
+
+        document.getElementById('pedidos').innerHTML =
+            pedidos.map(p => `
+
+            <div class="card" style="margin-bottom:25px">
+
+                <h3>
+                    Pedido #${p.codigo_pedido || p.id}
+                </h3>
+
+                <p>
+                    Status:
+                    <strong>${p.status}</strong>
+                </p>
+
+                <p>
+                    Total:
+                    <strong>
+                        R$ ${Number(p.total).toFixed(2).replace('.',',')}
+                    </strong>
+                </p>
+
+                <p>
+                    Data:
+                    ${new Date(p.created_at).toLocaleDateString('pt-BR')}
+                </p>
+
+                <button
+                    class="btn"
+                    onclick="verDetalhes(${p.id})">
+
+                    Ver detalhes
+
+                </button>
+
+                <div
+                    id="detalhes-${p.id}"
+                    style="display:none;margin-top:20px">
+
+                </div>
+
+            </div>
+
+        `).join('');
+
+    }
+
+    catch(e){
+
+        toast(e.message,'erro');
+
+    }
+
+})();
+
+
+
+async function verDetalhes(id) {
+    // 1. Captura a div de detalhes correspondente ao ID
+    const div = document.getElementById(`detalhes-${id}`);
+    
+    if (!div) {
+        console.error(`Elemento detalhes-${id} não encontrado.`);
+        return;
+    }
+
+    try {
+        // 2. Se a div já tiver conteúdo, apenas alterna a visibilidade (Toggle)
+        if (div.innerHTML.trim() !== '') {
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            return;
+        }
+
+        // 3. Busca os dados do pedido na API
+        const pedido = await api(`/orders/${id}`);
+
+        // 4. Renderiza os itens do pedido e as informações gerais
+        div.innerHTML = `
+            ${pedido.itens.map(item => `
+                <div style="
+                    display:flex;
+                    gap:18px;
+                    align-items:center;
+                    padding:15px 0;
+                    border-bottom:1px solid #ececec;
+                ">
+                    <a href="produto.html?id=${item.produto_id}">
+                        <img
+                            src="${item.imagem}"
+                            alt="${item.nome_produto}"
+                            style="
+                                width:90px;
+                                height:90px;
+                                object-fit:cover;
+                                border-radius:10px;
+                                cursor:pointer;
+                                transition:.25s;
+                            "
+                            onmouseover="this.style.transform='scale(1.05)'"
+                            onmouseout="this.style.transform='scale(1)'"
+                        >
+                    </a>
+
+                    <div style="flex:1">
+                        <h4 style="margin-bottom:8px">
+                            <a
+                                href="produto.html?id=${item.produto_id}"
+                                style="
+                                    color:#222;
+                                    text-decoration:none;
+                                ">
+                                ${item.nome_produto}
+                            </a>
+                        </h4>
+
+                        <div>Cor: ${item.cor}</div>
+                        <div>Tamanho: ${item.tamanho}</div>
+                        <div>Quantidade: ${item.quantidade}</div>
+                        <div>
+                            Valor:
+                            <strong>
+                                R$ ${Number(item.preco_unitario).toFixed(2).replace('.', ',')}
+                            </strong>
+                        </div>
+                        <div>
+                            Subtotal:
+                            <strong>
+                                R$ ${Number(item.subtotal).toFixed(2).replace('.', ',')}
+                            </strong>
+                        </div>
+
+                        <button
+                            class="btn"
+                            style="margin-top:12px"
+                            onclick="location.href='produto.html?id=${item.produto_id}'">
+                            Ver produto
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+
+            <div style="
+                margin-top:20px;
+                background:#fafafa;
+                padding:15px;
+                border-radius:10px;
+            ">
+                <div>
+                    <strong>Status:</strong>
+                    ${pedido.status}
+                </div>
+                <div>
+                    <strong>Pagamento:</strong>
+                    ${pedido.status_pagamento}
+                </div>
+                <div>
+                    <strong>Total:</strong>
+                    R$ ${Number(pedido.total).toFixed(2).replace('.', ',')}
+                </div>
+            </div>
+        `;
+
+        // 5. Exibe a div agora preenchida
+        div.style.display = 'block';
+
+    } catch (e) {
+        console.error(e);
+        alert("Erro ao buscar detalhes do pedido: " + e.message);
+    }
+}
+</script>
+</body>
+</html>

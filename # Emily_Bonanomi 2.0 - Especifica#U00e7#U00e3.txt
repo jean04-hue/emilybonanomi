@@ -1,0 +1,546 @@
+# Emily_Bonanomi 2.0 - Especificação Oficial do Projeto
+
+## 1. Objetivo
+
+Desenvolver uma loja virtual profissional para venda de roupas masculinas e femininas, com foco em experiência do usuário, visual boutique premium, responsividade total e estrutura preparada para crescimento.
+
+---
+
+# 2. Tecnologias
+
+## Frontend
+
+* HTML5
+* CSS3
+* JavaScript Vanilla
+
+## Backend
+
+* Node.js
+* Express.js
+
+## Banco de Dados
+
+* PostgreSQL
+
+## Armazenamento de Imagens
+
+* Cloudinary
+
+## Hospedagem
+
+Frontend:
+
+* Netlify
+
+Backend:
+
+* Render
+
+---
+
+# 3. Identidade Visual
+
+Nome da Loja:
+
+Emily_Bonanomi
+
+## Cores Oficiais
+
+Verde Principal:
+
+#2e7d32
+
+Bege Principal:
+
+#d9a57c
+
+## Estilo
+
+* Boutique Premium
+* Elegante
+* Limpo
+* Minimalista
+* Mobile First
+* UX moderna
+* UI moderna
+* Animações suaves
+* Visual profissional
+
+---
+
+# 4. Tipos de Usuário
+
+## Cliente
+
+Pode:
+
+* Criar conta
+* Fazer login
+* Editar perfil
+* Gerenciar endereços
+* Favoritar produtos
+* Comprar produtos
+* Avaliar produtos comprados
+* Consultar pedidos
+
+## Administrador
+
+Pode:
+
+* Cadastrar produtos
+* Editar produtos
+* Excluir produtos
+* Gerenciar categorias
+* Gerenciar estoque
+* Gerenciar pedidos
+* Gerenciar avaliações
+* Gerenciar clientes
+
+---
+
+# 5. Estrutura de Páginas
+
+## Públicas
+
+Home
+
+Loja
+
+Detalhes do Produto
+
+Login
+
+Cadastro
+
+## Privadas Cliente
+
+Minha Conta
+
+Meus Pedidos
+
+Favoritos
+
+Carrinho
+
+Checkout
+
+Pagamento PIX
+
+## Privadas Administrador
+
+Dashboard
+
+Produtos
+
+Categorias
+
+Pedidos
+
+Clientes
+
+Avaliações
+
+---
+
+# 6. Cadastro de Usuário
+
+Campos obrigatórios:
+
+* Nome
+* Sobrenome
+* Email
+* Telefone
+* Senha
+
+---
+
+# 7. Endereços
+
+Cada usuário possui:
+
+* Um endereço principal
+
+Pode cadastrar:
+
+* Endereços adicionais
+
+Durante a compra:
+
+* Endereço principal vem preenchido automaticamente
+* Usuário pode selecionar outro endereço
+
+---
+
+# 8. Categorias
+
+Categorias são criadas pelo administrador.
+
+Exemplos:
+
+* Masculino
+* Feminino
+* Acessórios
+* Moda Praia
+* Camisas
+* Calçados
+
+O sistema não terá categorias fixas.
+
+---
+
+# 9. Produtos
+
+Cada produto terá:
+
+* Nome
+* Descrição
+* Categoria
+* Preço
+* Preço Promocional (opcional)
+* Status ativo/inativo
+
+---
+
+# 10. Imagens dos Produtos
+
+Armazenamento:
+
+Cloudinary
+
+Cada produto poderá possuir:
+
+* Múltiplas imagens
+
+Administrador poderá:
+
+* Adicionar
+* Remover
+* Substituir imagens
+
+---
+
+# 11. Variações
+
+Cada produto poderá possuir:
+
+Cor
+
+Exemplo:
+
+* Preto
+* Branco
+* Azul
+
+Tamanhos por cor
+
+Exemplo:
+
+Cor Preta
+
+P = 5
+M = 8
+G = 3
+
+Cor Azul
+
+P = 10
+M = 6
+G = 4
+
+Controle de estoque individual por variação.
+
+---
+
+# 12. Estoque
+
+Quando estoque chegar a zero:
+
+Produto continua visível.
+
+Exibir:
+
+"Produto indisponível"
+
+Não permitir compra.
+
+Não permitir venda sem estoque.
+
+---
+
+# 13. Favoritos
+
+Disponível apenas para usuários logados.
+
+Usuário pode:
+
+* Adicionar favorito
+* Remover favorito
+
+---
+
+# 14. Carrinho
+
+Carrinho persistente.
+
+Mesmo após logout:
+
+* Produtos permanecem salvos
+
+Carrinho armazenado em banco de dados.
+
+Não depender de localStorage.
+
+---
+
+# 15. Fluxo de Compra
+
+Produto
+
+↓
+
+Adicionar ao Carrinho
+
+↓
+
+Carrinho
+
+↓
+
+Checkout
+
+↓
+
+Escolha do Endereço
+
+↓
+
+Pagamento PIX
+
+↓
+
+Upload do Comprovante
+
+↓
+
+Pedido criado
+
+↓
+
+Status: Aguardando Pagamento
+
+↓
+
+Admin confirma pagamento
+
+↓
+
+Status: Pago
+
+↓
+
+Separando
+
+↓
+
+Enviado
+
+↓
+
+Entregue
+
+↓
+
+Cliente pode avaliar
+
+---
+
+# 16. PIX
+
+Versão Inicial
+
+PIX manual
+
+Exibir:
+
+* Chave PIX
+* Copiar chave
+
+Cliente envia comprovante.
+
+Administrador aprova pagamento.
+
+Versão futura:
+
+Integração Mercado Pago.
+
+---
+
+# 17. Status do Pedido
+
+Aguardando Pagamento
+
+Pago
+
+Separando
+
+Enviado
+
+Entregue
+
+Cancelado
+
+Devolução Solicitada
+
+Devolução Aprovada
+
+Devolução Recusada
+
+---
+
+# 18. Cancelamento
+
+Permitido apenas antes do envio.
+
+Após status "Enviado":
+
+Não pode cancelar.
+
+Pode solicitar devolução.
+
+---
+
+# 19. Avaliações
+
+Somente clientes que compraram o produto.
+
+Avaliação composta por:
+
+* Nota de 1 a 5 estrelas
+* Comentário
+
+---
+
+# 20. Busca
+
+Busca inteligente.
+
+Exemplo:
+
+Pesquisar:
+
+cam
+
+Resultados:
+
+* camisa
+* camiseta
+* camisa polo
+
+---
+
+# 21. Filtros
+
+Categoria
+
+Preço
+
+Cor
+
+Tamanho
+
+Disponibilidade
+
+---
+
+# 22. Produtos Relacionados
+
+Não será implementado inicialmente.
+
+---
+
+# 23. Cupons
+
+Não serão implementados inicialmente.
+
+---
+
+# 24. Dashboard Administrativo
+
+Exibir:
+
+* Total de produtos
+* Total de clientes
+* Total de pedidos
+* Pedidos aguardando pagamento
+* Produtos sem estoque
+
+---
+
+# 25. Banco de Dados
+
+Tabelas previstas:
+
+usuarios
+
+enderecos
+
+categorias
+
+produtos
+
+produto_imagens
+
+produto_variacoes
+
+favoritos
+
+carrinho
+
+carrinho_itens
+
+pedidos
+
+pedido_itens
+
+avaliacoes
+
+comprovantes_pagamento
+
+---
+
+# 26. Regras de Desenvolvimento
+
+Toda funcionalidade deverá:
+
+1. Ser implementada completa.
+2. Ser testada antes da próxima etapa.
+3. Possuir código final pronto para produção.
+4. Não utilizar soluções temporárias.
+5. Não alterar arquitetura sem aprovação.
+
+---
+
+# 27. Objetivo Final
+
+Transformar a Emily_Bonanomi em uma loja virtual real, preparada para vendas online, crescimento futuro e manutenção simplificada.
+
+
+ETAPA 0 - Planejamento (OK)
+ETAPA 1 - Ambiente (OK)
+ETAPA 2 - Backend
+ETAPA 3 - Banco PostgreSQL (OK)
+ETAPA 4 - Autenticação
+ETAPA 5 - Produtos
+ETAPA 6 - Categorias
+ETAPA 7 - Cloudinary
+ETAPA 8 - Carrinho
+ETAPA 9 - Favoritos
+ETAPA 10 - Pedidos
+ETAPA 11 - Mercado Pago
+ETAPA 12 - Avaliações
+ETAPA 13 - Dashboard Admin
+ETAPA 14 - Frontend
+ETAPA 15 - Integração Front + API
+ETAPA 16 - Deploy
+ETAPA 17 - Testes Finais

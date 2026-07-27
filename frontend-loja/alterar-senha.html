@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir Senha – Emily Bonanomi</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .box-senha {
+            max-width: 480px;
+            margin: 60px auto 100px;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .box-senha h2 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #111111;
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+
+        .box-senha p {
+            color: #666666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #333333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            color: #111111;
+            background: #ffffff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #111111;
+            box-shadow: 0 0 0 1px #111111;
+        }
+
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        .btn-salvar {
+            width: 100%;
+            background: #2e7d32;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            margin-top: 8px;
+        }
+
+        .btn-salvar:hover { background: #236327; }
+
+        .btn-salvar:active {
+            transform: scale(0.99);
+        }
+
+        .btn-salvar:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="eb-topbar"></div>
+    <div id="eb-header"></div>
+
+    <main class="container">
+        <div class="box-senha">
+            <h2 id="tituloPagina">Redefinir Senha</h2>
+
+            <p id="textoPagina">
+                Você acessou com uma senha temporária.<br>
+                Por motivos de segurança, cadastre uma nova senha para continuar navegando na loja.
+            </p>
+
+            <form id="formAlterarSenha">
+                <div class="form-group">
+                    <label for="novaSenha">Nova Senha</label>
+                    <input type="password" id="novaSenha" minlength="6" required placeholder="Mínimo de 6 caracteres">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmarSenha">Confirmar Nova Senha</label>
+                    <input type="password" id="confirmarSenha" required placeholder="Repita a nova senha">
+                </div>
+
+                <button type="submit" class="btn-salvar" id="btnSubmit">Salvar Nova Senha</button>
+            </form>
+        </div>
+    </main>
+
+    <div id="eb-footer"></div>
+
+    <script src="config.js"></script>
+    <script src="partials.js"></script>
+    <script>
+        const token = new URLSearchParams(location.search).get('token');
+        const titulo = document.getElementById('tituloPagina');
+        const texto = document.getElementById('textoPagina');
+
+        if (token) {
+            document.title = 'Criar Nova Senha – Emily Bonanomi';
+            titulo.innerText = 'Criar Nova Senha';
+            texto.innerHTML = `
+                Recebemos uma solicitação para redefinir sua senha.<br><br>
+                Escolha uma nova senha para sua conta. Após salvar, utilize-a para acessar normalmente a loja.
+            `;
+        }
+
+        document.getElementById('formAlterarSenha').onsubmit = async (e) => {
+            e.preventDefault();
+
+            const novaSenha = document.getElementById('novaSenha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
+            const btn = document.getElementById('btnSubmit');
+
+            if (novaSenha !== confirmarSenha) {
+                if (window.toast) toast('As senhas não coincidem!', 'erro');
+                else alert('As senhas não coincidem!');
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerText = 'Salvando...';
+
+                if (token) {
+                    await api('/auth/reset-password', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            token,
+                            novaSenha
+                        })
+                    });
+                } else {
+                    await api('/profile/reset-temp-password', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            novaSenha
+                        })
+                    });
+                }
+
+                if (window.toast) {
+                    toast('Senha alterada com sucesso!');
+                } else {
+                    alert('Senha alterada com sucesso!');
+                }
+
+                if (token) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('usuario');
+
+                    setTimeout(() => {
+                        window.location.href = 'login-cliente.html';
+                    }, 1200);
+                } else {
+                    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+                    usuario.senha_temporaria = false;
+
+                    localStorage.setItem('usuario', JSON.stringify(usuario));
+
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1200);
+                }
+
+            } catch (err) {
+                if (window.toast) toast(err.message, 'erro');
+                else alert('Erro ao alterar senha: ' + err.message);
+
+                btn.disabled = false;
+                btn.innerText = 'Salvar Nova Senha';
+            }
+        };
+    </script>
+</body>
+</html>

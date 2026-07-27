@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><title>Nova categoria</title>
+<link rel="stylesheet" href="admin.css">
+<script src="config.js"></script><script src="admin.js"></script>
+</head>
+<body>
+<script>if(!guard()){throw 'x'} sidebar('categorias');</script>
+<main class="main">
+    <div class="topbar"><h1>Nova categoria</h1><a href="categorias.html" class="btn btn-outline">← Voltar</a></div>
+    <form id="form" class="card">
+        <label>Nome</label><input id="nome" required>
+        <label>Slug</label><input id="slug" required placeholder="ex: vestidos">
+        <div style="margin-top:16px"><button class="btn btn-beige">Criar</button></div>
+    </form>
+</main>
+<script>
+document.getElementById('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+        await api('/admin/categories', { method:'POST', body:{
+            nome: document.getElementById('nome').value,
+            slug: document.getElementById('slug').value
+        }});
+        toast('Categoria criada'); setTimeout(()=>location.href='categorias.html', 500);
+    } catch {}
+});
+</script>
+</body></html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus Favoritos – Emily Bonanomi</title>
+<meta name="description" content="Suas peças favoritas salvas na Emily Bonanomi.">
+<meta property="og:title" content="Meus Favoritos – Emily Bonanomi">
+<meta property="og:description" content="Suas peças favoritas salvas na Emily Bonanomi.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="/favoritos.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="/favoritos.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👗%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="eb-topbar"></div>
+<div id="eb-header"></div>
+
+<main class="container">
+  <h1>Meus favoritos</h1>
+  <div id="grid" class="grid-produtos"></div>
+</main>
+
+<div id="eb-footer"></div>
+
+<script src="config.js"></script>
+<script src="partials.js"></script>
+<script>
+if (exigirLogin()) (async () => {
+  try {
+    const favs = await api('/favorites');
+    document.getElementById('grid').innerHTML = favs.length ? favs.map(f => `
+      <article class="produto-card">
+        <a href="produto.html?id=${f.produto_id}" class="img-wrap">
+          <img src="${f.imagem || 'https://via.placeholder.com/400x500?text=Sem+imagem'}" alt="${f.nome}">
+        </a>
+        <div class="info">
+          <h3>${f.nome}</h3>
+          <p class="preco">R$ ${Number(f.preco_promocional||f.preco).toFixed(2).replace('.',',')}</p>
+          <button class="btn-link" onclick="remover(${f.produto_id})">❌ Remover</button>
+        </div>
+      </article>`).join('') : '<p style="text-align:center;padding:40px">Você ainda não favoritou nenhum produto.</p>';
+  } catch (e) { toast(e.message, 'erro'); }
+})();
+window.remover = async id => {
+  try { await api('/favorites/' + id, { method:'DELETE' }); location.reload(); }
+  catch(e){ toast(e.message,'erro'); }
+};
+</script>
+</body>
+</html>

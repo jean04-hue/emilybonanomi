@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Login Admin — Emily Bonanomi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body class="login-page">
+
+<div class="login-box">
+    <h1>Emily Admin</h1>
+    <p class="sub">Acesso exclusivo ao painel administrativo</p>
+    <form id="loginForm" autocomplete="off">
+        <label>E-mail</label>
+        <input type="email" id="email" required autofocus>
+        <label>Senha</label>
+        <input type="password" id="senha" required>
+        <button type="submit">Entrar</button>
+    </form>
+</div>
+
+<script src="config.js"></script>
+<script src="admin.js"></script>
+<script>
+// Se já está logado como admin, pula direto
+(function () {
+    const u = getUser();
+    const role = u && (u.role || u.tipo_usuario);
+    if (getToken() && role === 'admin') location.replace('dashboard.html');
+})();
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    try {
+        const res = await fetch(API_BASE + '/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            toast(data.erro || data.error || 'Falha no login', 'error');
+            return;
+        }
+        // backend responde { token, usuario:{... tipo_usuario} } OU { success, data:{ token, user } }
+        const payload = (data.data && data.data.token) ? data.data : data;
+        const token = payload.token;
+        const user  = payload.usuario || payload.user;
+        const role  = user && (user.role || user.tipo_usuario);
+        if (role !== 'admin') {
+            toast('Somente administradores', 'error');
+            return;
+        }
+        saveSession(token, user);
+        toast('Bem-vindo, ' + (user.nome || 'admin'));
+        setTimeout(() => location.href = 'dashboard.html', 400);
+    } catch (err) {
+        toast(err.message || 'Erro ao conectar', 'error');
+    }
+});
+</script>
+</body>
+</html>
