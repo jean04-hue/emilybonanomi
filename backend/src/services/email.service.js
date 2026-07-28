@@ -3,12 +3,16 @@ console.log('SMTP_PORT:', process.env.SMTP_PORT);
 console.log('SMTP_USER:', process.env.SMTP_USER);
 console.log('SMTP_PASS:', process.env.SMTP_PASS ? 'OK' : 'VAZIO');
 
-const nodemailer = require('nodemailer');
-
 const transporter = nodemailer.createTransport({
+
     host: process.env.SMTP_HOST,
+
     port: Number(process.env.SMTP_PORT),
+
     secure: false,
+
+    family: 4,
+
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -17,8 +21,8 @@ const transporter = nodemailer.createTransport({
     connectionTimeout: 30000,
     greetingTimeout: 30000,
     socketTimeout: 30000
-});
 
+});
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
     const htmlContent = `
 <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
