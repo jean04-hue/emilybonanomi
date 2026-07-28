@@ -114,23 +114,21 @@ async function forgotPassword(email) {
 
         );
 
-        console.log(
+console.log(
 'FRONTEND_LOJA_URL:',
 process.env.FRONTEND_LOJA_URL
 );
 
-    const link =
+const link =
 `${process.env.FRONTEND_LOJA_URL}/alterar-senha.html?token=${token}`;
 
-    await emailService.enviarEmailRecuperacao({
+console.log('LINK GERADO:', link);
 
-        to: usuario.email,
-
-        nome: usuario.nome,
-
-        link
-
-    });
+await emailService.enviarEmailRecuperacao({
+    to: usuario.email,
+    nome: usuario.nome,
+    link
+});
 
 }
 
