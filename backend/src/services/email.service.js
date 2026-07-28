@@ -20,6 +20,25 @@ const transporter = nodemailer.createTransport({
     socketTimeout: 30000
 });
 
+const dns = require("dns");
+
+dns.lookup("smtp.gmail.com", { family: 4 }, (err, address) => {
+    console.log("DNS:", err, address);
+});
+
+const net = require("net");
+
+const socket = net.createConnection(587, "smtp.gmail.com");
+
+socket.on("connect", () => {
+    console.log("PORTA 587 OK");
+    socket.destroy();
+});
+
+socket.on("error", (err) => {
+    console.log(err);
+});
+
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
     const htmlContent = `
 <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
