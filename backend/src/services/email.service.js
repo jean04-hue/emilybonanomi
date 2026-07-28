@@ -6,13 +6,17 @@ console.log('SMTP_PASS:', process.env.SMTP_PASS ? 'OK' : 'VAZIO');
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_PORT == 465, // true para porta 465, false para outras portas
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-    }
+    },
+
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000
 });
 
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
@@ -238,12 +242,33 @@ Todos os direitos reservados.
 </div>
 `;
 
-    return await transporter.sendMail({
-        from: process.env.MAIL_FROM || 'Emily Bonanomi <financeiro.neiderjean@gmail.com>',
+    try {
+
+    const info = await transporter.sendMail({
+
+        from: process.env.SMTP_USER,
+
         to,
+
         subject: '🔑 Sua senha temporária de acesso - Emily Bonanomi',
+
         html: htmlContent
+
     });
+
+    console.log("EMAIL TEMPORÁRIO ENVIADO");
+    console.log(info);
+
+    return info;
+
+} catch(err){
+
+    console.error("ERRO EMAIL TEMPORÁRIO");
+    console.error(err);
+
+    throw err;
+
+}
 }
 
 async function enviarEmailRecuperacao({
@@ -433,20 +458,32 @@ Todos os direitos reservados.
 </div>
 `;
 
-    return transporter.sendMail({
+    try {
 
-        from:
-            process.env.MAIL_FROM ||
-            'Emily Bonanomi <financeiro.neiderjean@gmail.com>',
+    const info = await transporter.sendMail({
+
+        from: process.env.SMTP_USER,
 
         to,
 
-        subject:
-            '🔐 Recuperação de senha - Emily Bonanomi',
+        subject: '🔐 Recuperação de senha - Emily Bonanomi',
 
         html: htmlContent
 
     });
+
+    console.log("EMAIL ENVIADO");
+    console.log(info);
+
+    return info;
+
+} catch(err){
+
+    console.error("ERRO SENDMAIL");
+    console.error(err);
+
+    throw err;
+}
 
 }
 
