@@ -8,13 +8,12 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
-    secure: false,
+    secure: Number(process.env.SMTP_PORT) === 465,
     family: 4,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
     },
-
     connectionTimeout: 30000,
     greetingTimeout: 30000,
     socketTimeout: 30000
@@ -22,21 +21,24 @@ const transporter = nodemailer.createTransport({
 
 const dns = require("dns");
 
-dns.lookup("smtp.gmail.com", { family: 4 }, (err, address) => {
+dns.lookup(process.env.SMTP_HOST, { family: 4 }, (err, address) => {
     console.log("DNS:", err, address);
 });
 
 const net = require("net");
 
-const socket = net.createConnection(587, "smtp.gmail.com");
+const socket = net.createConnection(
+    Number(process.env.SMTP_PORT),
+    process.env.SMTP_HOST
+);
 
 socket.on("connect", () => {
-    console.log("PORTA 587 OK");
+    console.log(`PORTA ${process.env.SMTP_PORT} OK`);
     socket.destroy();
 });
 
 socket.on("error", (err) => {
-    console.log(err);
+    console.log("ERRO TCP:", err);
 });
 
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
