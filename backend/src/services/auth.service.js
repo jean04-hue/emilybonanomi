@@ -114,18 +114,19 @@ async function forgotPassword(email) {
 
         );
 
-    const link =
-`${process.env.FRONTEND_RESET_URL}?token=${token}`;
+        console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
 
-    await emailService.enviarEmailRecuperacao({
+// Trata o FRONTEND_URL removendo qualquer barra no final (caso exista)
+const baseUrl = (process.env.FRONTEND_URL || '').replace(/\/$/, '');
 
-        to: usuario.email,
+// Monta o link limpo e sem barras duplicadas
+const link = `${baseUrl}/alterar-senha.html?token=${token}`;
 
-        nome: usuario.nome,
-
-        link
-
-    });
+await emailService.enviarEmailRecuperacao({
+    to: usuario.email,
+    nome: usuario.nome,
+    link
+});
 
 }
 
