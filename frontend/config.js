@@ -1,6 +1,6 @@
 window.API_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:3000/api'
-    : 'https://SEU-BACKEND.onrender.com/api';
+    : 'https://emily-bonanomi-api.onrender.com/api';
 
 window.api = async function(path, opts = {}) {
     const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
