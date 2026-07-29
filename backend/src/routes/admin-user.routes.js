@@ -198,13 +198,14 @@ router.post('/:id/reset-password', async (req, res) => {
 
         try {
 
-            const linkLoja = process.env.FRONTEND_LOJA_URL;
+const linkLoja =
+`${process.env.FRONTEND_LOJA_URL}/login-cliente.html`;
 
 await emailService.enviarEmailRedefinicaoSenha({
     to: usuario.email,
     nome: usuario.nome,
     senhaTemporaria: senha,
-    linkLoja: `${process.env.FRONTEND_LOJA_URL}/login-cliente.html`
+    linkLoja
 });
 
         }

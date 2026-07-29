@@ -124,11 +124,25 @@ const link =
 
 console.log('LINK GERADO:', link);
 
-await emailService.enviarEmailRecuperacao({
-    to: usuario.email,
-    nome: usuario.nome,
-    link
-});
+try {
+
+    await emailService.enviarEmailRecuperacao({
+        to: usuario.email,
+        nome: usuario.nome,
+        link
+    });
+
+    console.log("EMAIL ENVIADO COM SUCESSO");
+
+} catch (err) {
+
+    console.error("ERRO AO ENVIAR EMAIL");
+
+    console.error(err);
+
+    throw err;
+
+}
 
 }
 

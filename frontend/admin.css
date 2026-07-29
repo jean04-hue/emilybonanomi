@@ -13,6 +13,10 @@ body {
     line-height: 1.5;
 }
 
+body.menu-open {
+    overflow: hidden;
+}
+
 h1, h2, h3, h4 {
     font-family: 'Playfair Display', serif;
     color: #2e7d32;
@@ -37,6 +41,8 @@ a:hover { color: #d9a57c; }
     position: fixed;
     top: 0; left: 0; bottom: 0;
     overflow-y: auto;
+    z-index: 1000;
+    transition: transform .3s ease, left .3s ease;
 }
 
 .sidebar .brand {
@@ -77,6 +83,7 @@ a:hover { color: #d9a57c; }
     flex: 1;
     margin-left: 220px;
     padding: 32px;
+    transition: margin-left .3s ease;
 }
 
 .topbar {
@@ -87,7 +94,7 @@ a:hover { color: #d9a57c; }
 }
 .topbar h1 { font-size: 26px; }
 
-/* ===== CARDS ===== */
+/* ===== CARDS & GRID ===== */
 .card {
     background: #fff;
     border: 1px solid #e6dfd5;
@@ -103,6 +110,13 @@ a:hover { color: #d9a57c; }
     gap: 16px;
     margin-bottom: 24px;
 }
+
+.dashboard-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
 .metric {
     background: #fff;
     border: 1px solid #e6dfd5;
@@ -342,64 +356,98 @@ button:hover, .btn:hover {
 }
 .var-row input { padding: 6px 10px; font-size: 13px; }
 
-/* ===== RESPONSIVO ===== */
-@media (max-width: 720px) {
-    .sidebar { width: 60px; }
-    .sidebar .brand, .sidebar nav a span { display: none; }
-    .main { margin-left: 60px; padding: 16px; }
+/* ===== STATUS EXTRA ===== */
+.status {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+.status.pago      { background: #dff7e6; color: #0b7a35; }
+.status.separando { background: #fff5d6; color: #8a6d00; }
+.status.enviado   { background: #e6f0ff; color: #0066cc; }
+.status.entregue  { background: #d7f8dc; color: #0d8a42; }
+.status.cancelado { background: #ffe5e5; color: #b30000; }
+
+/* ===== BOTÃO TOGGLE MOBILE ===== */
+.menu-toggle {
+    display: none;
 }
 
-
-.status{
-
-    display:inline-block;
-
-    padding:6px 14px;
-
-    border-radius:20px;
-
-    font-weight:bold;
-
-    font-size:13px;
-
+/* ===== OVERLAY (MÁSCARA DE FUNDO NO MOBILE) ===== */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility .3s ease;
+    z-index: 999;
 }
 
-.status.pago{
-
-    background:#dff7e6;
-
-    color:#0b7a35;
-
+.sidebar-overlay.show {
+    opacity: 1;
+    visibility: visible;
 }
 
-.status.separando{
+/* ===========================
+   RESPONSIVO - MOBILE (<= 768px)
+=========================== */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
 
-    background:#fff5d6;
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        width: 250px;
+        height: 100vh;
+        z-index: 1000;
+    }
 
-    color:#8a6d00;
+    .sidebar.open {
+        left: 0;
+    }
 
-}
+    .main {
+        margin-left: 0 !important;
+        width: 100%;
+        padding: 16px;
+    }
 
-.status.enviado{
+    .topbar {
+        padding-left: 50px;
+    }
 
-    background:#e6f0ff;
+    .grid {
+        grid-template-columns: 1fr;
+    }
 
-    color:#0066cc;
+    .dashboard-bottom {
+        grid-template-columns: 1fr;
+    }
 
-}
+    .card {
+        width: 100%;
+    }
 
-.status.entregue{
-
-    background:#d7f8dc;
-
-    color:#0d8a42;
-
-}
-
-.status.cancelado{
-
-    background:#ffe5e5;
-
-    color:#b30000;
-
+    .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1100;
+        border: none;
+        background: #2e7d32;
+        color: #fff;
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        font-size: 22px;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
 }

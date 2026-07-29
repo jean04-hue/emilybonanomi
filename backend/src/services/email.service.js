@@ -1,6 +1,7 @@
 // Usamos a API REST do Brevo diretamente via fetch (Sem erro de SDK!)
 
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
+
     const htmlContent = `
 <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">

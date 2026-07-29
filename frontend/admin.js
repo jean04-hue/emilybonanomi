@@ -25,7 +25,7 @@ function clearSession() {
 function guard() {
     const u = getUser();
     const t = getToken();
-    // backend usa `tipo_usuario`; a spec fala em `role`. Aceita os dois.
+    // backend usa tipo_usuario; a spec fala em role. Aceita os dois.
     const role = u && (u.role || u.tipo_usuario);
     if (!t || !u || role !== 'admin') {
         location.replace('login.html');
