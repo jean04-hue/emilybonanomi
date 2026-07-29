@@ -2,16 +2,130 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Detalhes do Pedido</title>
+    <title>Detalhes do Pedido — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
+    <div id="loading" class="card"><p style="color:#999">Carregando detalhes do pedido...</p></div>
 
-    <h1>Detalhes do Pedido</h1>
+    <div id="conteudoPedido" style="display:none;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
+            
+            <!-- ESQUERDA: ITENS DO PEDIDO -->
+            <div>
+                <div class="card" style="padding:0; margin-bottom:16px;">
+                    <div style="padding:12px 16px; border-bottom:1px solid #eee;">
+                        <h3 style="font-size:15px; margin:0;">Itens Comprados</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Variação</th>
+                                <th>Qtd</th>
+                                <th>Preço Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itensPedido"></tbody>
+                    </table>
+                </div>
 
-    <div id="pedido"></div>
-<link rel="stylesheet" href="admin.css">
-    <script src="admin.js"></script>
-  <script src="pedido.js"></script>
+                <!-- DADOS DE ENTREGA -->
+                <div class="card">
+                    <h3 style="font-size:15px; margin-bottom:12px;">Endereço de Entrega</h3>
+                    <div id="enderecoEntrega" style="font-size:13px; line-height:1.6; color:#444;"></div>
+                </div>
+            </div>
 
+            <!-- DIREITA: PAINEL DE AÇÕES E RESUMO -->
+            <div>
+                <div class="card" style="margin-bottom:16px;">
+                    <h3 style="font-size:15px; margin-bottom:12px;">Resumo dos Valores</h3>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;">
+                        <span>Subtotal:</span> <span id="subtotalVal">R$ 0,00</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;">
+                        <span>Frete:</span> <span id="freteVal">R$ 0,00</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:bold; border-top:1px solid #eee; padding-top:8px; margin-top:8px;">
+                        <span>Total:</span> <span id="totalVal">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size:15px; margin-bottom:12px;">Dados do Cliente</h3>
+                    <p id="clienteInfo" style="font-size:13px; line-height:1.5; color:#444; margin:0;"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    renderLayout({
+        active: 'pedidos',
+        title: 'Detalhes do Pedido',
+        actions: '<a href="pedidos.html" class="btn btn-outline">← Voltar</a>'
+    });
+
+    const ID = qs('id');
+
+    (async () => {
+        if (!ID) {
+            document.getElementById('loading').innerHTML = '<p style="color:red">ID do pedido não informado.</p>';
+            return;
+        }
+
+        try {
+            const p = await api('/admin/orders/' + ID);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('conteudoPedido').style.display = 'block';
+
+            // Preenche cliente
+            document.getElementById('clienteInfo').innerHTML = `
+                <b>${p.cliente || 'Cliente não identificado'}</b><br>
+                ${p.email || ''}<br>
+                ${p.telefone || ''}
+            `;
+
+            // Preenche totais
+            document.getElementById('subtotalVal').innerText = money(p.subtotal || p.total);
+            document.getElementById('freteVal').innerText = money(p.valor_frete || 0);
+            document.getElementById('totalVal').innerText = money(p.total);
+
+            // Preenche endereço
+            const end = p.endereco_entrega || p.endereco || {};
+            document.getElementById('enderecoEntrega').innerHTML = typeof end === 'string' ? end : `
+                ${end.logradouro || '-'}, ${end.numero || ''} ${end.complemento ? ' - ' + end.complemento : ''}<br>
+                ${end.bairro || ''} — ${end.cidade || ''}/${end.estado || ''}<br>
+                CEP: ${end.cep || '-'}
+            `;
+
+            // Preenche itens
+            const tb = document.getElementById('itensPedido');
+            const itens = p.itens || p.items || [];
+            if (!itens.length) {
+                tb.innerHTML = '<tr><td colspan="5">Nenhum item encontrado no pedido.</td></tr>';
+            } else {
+                tb.innerHTML = itens.map(i => `
+                    <tr>
+                        <td><b>${i.nome || i.produto_nome || 'Produto'}</b></td>
+                        <td>${i.cor || ''} ${i.tamanho ? '/ ' + i.tamanho : ''}</td>
+                        <td>${i.quantidade}</td>
+                        <td>${money(i.preco_unitario || i.preco)}</td>
+                        <td>${money((i.preco_unitario || i.preco) * i.quantidade)}</td>
+                    </tr>
+                `).join('');
+            }
+
+        } catch (err) {
+            document.getElementById('loading').innerHTML = '<p style="color:red">Erro ao carregar os dados do pedido.</p>';
+        }
+    })();
+    </script>
 </body>
 </html>

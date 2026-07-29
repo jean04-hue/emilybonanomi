@@ -1,56 +1,82 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Clientes — Admin</title>
-<link rel="stylesheet" href="admin.css">
-<script src="config.js"></script><script src="admin.js"></script>
+    <meta charset="UTF-8">
+    <title>Clientes — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
-<script>if(!guard()){throw 'x'} sidebar('clientes');</script>
-
-<main class="main">
-    <div class="topbar"><h1>Clientes</h1></div>
     <div class="card" style="padding:0">
-        <table><thead><tr>
-            <th>ID</th><th>Nome</th><th>E-mail</th><th>Telefone</th>
-            <th>Tipo</th><th>Ativo</th><th>Pedidos</th><th>Cadastro</th><th style="width:180px">Ações</th>
-        </tr></thead>
-        <tbody id="tabela"><tr><td colspan="9">Carregando…</td></tr></tbody></table>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Telefone</th>
+                    <th>Tipo</th>
+                    <th>Ativo</th>
+                    <th>Pedidos</th>
+                    <th>Cadastro</th>
+                    <th style="width:180px">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela">
+                <tr><td colspan="9">Carregando…</td></tr>
+            </tbody>
+        </table>
     </div>
-</main>
 
-<script>
-(async () => {
-    let users = [];
-    try { users = await api('/admin/users'); } catch { return; }
-    // conta pedidos por cliente
-    let pedidos = [];
-    try { pedidos = await api('/admin/orders'); } catch {}
-    const cont = {};
-    pedidos.forEach(p => { const uid = p.usuario_id || p.cliente_id; if (uid) cont[uid] = (cont[uid]||0)+1; });
+    <script>
+    renderLayout({
+        active: 'clientes',
+        title: 'Clientes'
+    });
 
-    const tb = document.getElementById('tabela');
-    if (!users.length) { tb.innerHTML = '<tr><td colspan="9">Nenhum cliente</td></tr>'; return; }
-    tb.innerHTML = users.map(u => `
-        <tr>
-            <td>${u.id}</td>
-            <td>${u.nome||''} ${u.sobrenome||''}</td>
-            <td>${u.email}</td>
-            <td>${u.telefone||'-'}</td>
-            <td>${u.tipo_usuario==='admin' ? '<span class="badge badge-green">Admin</span>' : 'Cliente'}</td>
-            <td>${u.ativo!==false ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-red">Não</span>'}</td>
-            <td>${cont[u.id] || 0}</td>
-            <td>${dateBR(u.created_at)}</td>
-            <td class="actions">
-                <button class="btn btn-sm btn-outline" onclick="toggle(${u.id})">${u.ativo!==false?'Desativar':'Ativar'}</button>
-                <a class="btn btn-sm" href="editar-cliente.html?id=${u.id}">Ver</a>
-            </td>
-        </tr>`).join('');
-})();
-async function toggle(id) {
-    if (!confirm('Alternar status do cliente?')) return;
-    try { await api('/admin/users/' + id + '/toggle', { method:'PATCH' }); toast('Atualizado'); setTimeout(()=>location.reload(),400); } catch {}
-}
-window.toggle = toggle;
-</script>
-</body></html>
+    (async () => {
+        let users = [];
+        try { users = await api('/admin/users'); } catch { return; }
+        
+        let pedidos = [];
+        try { pedidos = await api('/admin/orders'); } catch {}
+        const cont = {};
+        pedidos.forEach(p => { 
+            const uid = p.usuario_id || p.cliente_id; 
+            if (uid) cont[uid] = (cont[uid] || 0) + 1; 
+        });
+
+        const tb = document.getElementById('tabela');
+        if (!users.length) { tb.innerHTML = '<tr><td colspan="9">Nenhum cliente cadastrado.</td></tr>'; return; }
+
+        tb.innerHTML = users.map(u => `
+            <tr>
+                <td>${u.id}</td>
+                <td><b>${u.nome || ''} ${u.sobrenome || ''}</b></td>
+                <td>${u.email}</td>
+                <td>${u.telefone || '-'}</td>
+                <td>${u.tipo_usuario === 'admin' ? '<span class="badge badge-green">Admin</span>' : 'Cliente'}</td>
+                <td>${u.ativo !== false ? '<span class="badge badge-green">Sim</span>' : '<span class="badge badge-gray">Não</span>'}</td>
+                <td>${cont[u.id] || 0}</td>
+                <td>${dateBR(u.created_at)}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-outline" onclick="toggle(${u.id})">${u.ativo !== false ? 'Desativar' : 'Ativar'}</button>
+                    <a class="btn btn-sm btn-beige" href="editar-cliente.html?id=${u.id}">Ver / Editar</a>
+                </td>
+            </tr>`).join('');
+    })();
+
+    async function toggle(id) {
+        if (!confirm('Alternar status do cliente?')) return;
+        try { 
+            await api('/admin/users/' + id + '/toggle', { method:'PATCH' }); 
+            toast('Status atualizado'); 
+            setTimeout(() => location.reload(), 400); 
+        } catch {}
+    }
+    window.toggle = toggle;
+    </script>
+</body>
+</html>

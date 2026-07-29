@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Pedidos — Admin</title>
-<link rel="stylesheet" href="admin.css">
-<script src="config.js"></script><script src="admin.js"></script>
+    <meta charset="UTF-8">
+    <title>Pedidos — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
-<script>if(!guard()){throw 'x'} sidebar('pedidos');</script>
+    <div class="card" style="padding:0">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Rastreio</th>
+                    <th>NF</th>
+                    <th style="width:260px">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela">
+                <tr><td colspan="7">Carregando…</td></tr>
+            </tbody>
+        </table>
+    </div>
 
-<main class="main">
-    <div class="topbar">
-        <h1>Pedidos</h1>
+    <script>
+    const filtroHtml = `
         <div>
-            <label style="display:inline-block;margin:0 8px 0 0">Filtrar:</label>
-            <select id="filtroStatus" onchange="carregar()">
+            <label style="font-size:13px; margin-right:6px">Filtrar:</label>
+            <select id="filtroStatus" onchange="carregar()" style="padding:6px">
                 <option value="">Todos</option>
                 <option value="aguardando_pagamento">Aguardando Pagamento</option>
                 <option value="pago">Pago</option>
@@ -23,103 +42,77 @@
                 <option value="cancelado">Cancelado</option>
                 <option value="devolvido">Devolvido</option>
             </select>
-        </div>
-    </div>
+        </div>`;
 
-    <div class="card" style="padding:0">
-        <table>
-            <thead><tr>
-                <th>#</th><th>Cliente</th><th>Total</th><th>Status</th>
-                <th>Rastreio</th><th>NF</th><th style="width:260px">Ações</th>
-            </tr></thead>
-            <tbody id="tabela"><tr><td colspan="7">Carregando…</td></tr></tbody>
-        </table>
-    </div>
-</main>
+    renderLayout({
+        active: 'pedidos',
+        title: 'Pedidos',
+        actions: filtroHtml
+    });
 
-<script>
-const STATUS = ['aguardando_pagamento','pago','separando','enviado','entregue','cancelado','devolvido'];
+    const STATUS = ['aguardando_pagamento','pago','separando','enviado','entregue','cancelado','devolvido'];
 
-async function carregar() {
-    const f = document.getElementById('filtroStatus').value;
-    const path = '/admin/orders' + (f ? '?status=' + f : '');
-    let pedidos = [];
-    try { pedidos = await api(path); } catch { return; }
-    const tb = document.getElementById('tabela');
-    if (!pedidos.length) { tb.innerHTML = '<tr><td colspan="7">Nenhum pedido</td></tr>'; return; }
-    tb.innerHTML = pedidos.map(p => `
-        <tr data-id="${p.id}">
-            <td><b>${p.codigo_pedido || p.id}</b><br><span style="color:#aaa;font-size:11px">${dateBR(p.created_at)}</span></td>
-            <td>${p.cliente}<br><span style="color:#aaa;font-size:11px">${p.email||''}</span></td>
-            <td>${money(p.total)}</td>
-            <td>
-                <select class="s-status">
-                    ${STATUS.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
-                </select>
-            </td>
-            <td>
-                <input class="s-transp" placeholder="Transportadora" value="${p.transportadora||''}" style="width:130px;font-size:12px;padding:6px">
-                <input class="s-rastreio" placeholder="Código" value="${p.codigo_rastreio||''}" style="width:130px;font-size:12px;padding:6px;margin-top:4px">
-            </td>
-            <td><input class="s-nf" placeholder="URL NF" value="${p.nota_fiscal_url||''}" style="width:150px;font-size:12px;padding:6px"></td>
-            <td class="actions">
+    async function carregar() {
+        const f = document.getElementById('filtroStatus').value;
+        const path = '/admin/orders' + (f ? '?status=' + f : '');
+        let pedidos = [];
+        try { pedidos = await api(path); } catch { return; }
+        const tb = document.getElementById('tabela');
+        if (!pedidos.length) { tb.innerHTML = '<tr><td colspan="7">Nenhum pedido encontrado.</td></tr>'; return; }
 
-    <button
-        class="btn btn-sm"
-        onclick="window.location.href='pedido.html?id=${p.id}'">
-
-        Detalhes
-
-    </button>
-
-    <button
-        class="btn btn-sm"
-        onclick="salvarPedido(this)">
-
-        Salvar
-
-    </button>
-
-    ${
-        p.status === 'aguardando_pagamento'
-        ? `
-        <button
-            class="btn btn-sm btn-beige"
-            onclick="confirmarPagto(this)">
-
-            Confirmar Pagto
-
-        </button>
-        `
-        : ''
+        tb.innerHTML = pedidos.map(p => `
+            <tr data-id="${p.id}">
+                <td><b>${p.codigo_pedido || p.id}</b><br><span style="color:#aaa;font-size:11px">${dateBR(p.created_at)}</span></td>
+                <td>${p.cliente}<br><span style="color:#aaa;font-size:11px">${p.email || ''}</span></td>
+                <td>${money(p.total)}</td>
+                <td>
+                    <select class="s-status" style="padding:4px; font-size:12px">
+                        ${STATUS.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+                    </select>
+                </td>
+                <td>
+                    <input class="s-transp" placeholder="Transportadora" value="${p.transportadora||''}" style="width:120px;font-size:12px;padding:4px"><br>
+                    <input class="s-rastreio" placeholder="Código" value="${p.codigo_rastreio||''}" style="width:120px;font-size:12px;padding:4px;margin-top:4px">
+                </td>
+                <td><input class="s-nf" placeholder="URL NF" value="${p.nota_fiscal_url||''}" style="width:130px;font-size:12px;padding:4px"></td>
+                <td class="actions">
+                    <button class="btn btn-sm" onclick="window.location.href='pedido.html?id=${p.id}'">Detalhes</button>
+                    <button class="btn btn-sm btn-outline" onclick="salvarPedido(this)">Salvar</button>
+                    ${p.status === 'aguardando_pagamento' ? `<button class="btn btn-sm btn-beige" onclick="confirmarPagto(this)">Confirmar Pagto</button>` : ''}
+                </td>
+            </tr>`).join('');
     }
 
-</td>
-        </tr>`).join('');
-}
+    async function salvarPedido(btn) {
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        const status = tr.querySelector('.s-status').value;
+        const codigo = tr.querySelector('.s-rastreio').value.trim();
+        const transportadora = tr.querySelector('.s-transp').value.trim();
+        try {
+            await api('/admin/orders/' + id + '/status', { method:'PATCH', body:{ status } });
+            if (codigo || transportadora) {
+                await api('/admin/orders/' + id + '/rastreio', { method:'POST', body:{ codigo, transportadora } });
+            }
+            toast('Pedido atualizado');
+        } catch {}
+    }
 
-async function salvarPedido(btn) {
-    const tr = btn.closest('tr');
-    const id = tr.dataset.id;
-    const status = tr.querySelector('.s-status').value;
-    const codigo = tr.querySelector('.s-rastreio').value.trim();
-    const transportadora = tr.querySelector('.s-transp').value.trim();
-    try {
-        await api('/admin/orders/' + id + '/status', { method:'PATCH', body:{ status } });
-        if (codigo || transportadora) {
-            await api('/admin/orders/' + id + '/rastreio', { method:'POST', body:{ codigo, transportadora } });
-        }
-        toast('Pedido atualizado. E-mail disparado se aplicável.');
-    } catch {}
-}
-async function confirmarPagto(btn) {
-    const tr = btn.closest('tr');
-    const id = tr.dataset.id;
-    if (!confirm('Confirmar pagamento manualmente?')) return;
-    try { await api('/admin/orders/' + id + '/confirmar-pagamento', { method:'POST' }); toast('Pagamento confirmado'); carregar(); }
-    catch {}
-}
-window.salvarPedido = salvarPedido; window.confirmarPagto = confirmarPagto; window.carregar = carregar;
-carregar();
-</script>
-</body></html>
+    async function confirmarPagto(btn) {
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        if (!confirm('Confirmar pagamento manualmente?')) return;
+        try { 
+            await api('/admin/orders/' + id + '/confirmar-pagamento', { method:'POST' }); 
+            toast('Pagamento confirmado'); 
+            carregar(); 
+        } catch {}
+    }
+
+    window.salvarPedido = salvarPedido; 
+    window.confirmarPagto = confirmarPagto; 
+    window.carregar = carregar;
+    carregar();
+    </script>
+</body>
+</html>

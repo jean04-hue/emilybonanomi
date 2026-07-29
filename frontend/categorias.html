@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Categorias — Admin</title>
-<link rel="stylesheet" href="admin.css">
-<script src="config.js"></script>
-<script src="admin.js"></script>
+    <meta charset="UTF-8">
+    <title>Categorias — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
-<script>if(!guard()){throw 'x'} sidebar('categorias');</script>
-
-<main class="main">
-    <div class="topbar">
-        <h1>Categorias</h1>
-        <a href="categoria-form.html" class="btn btn-beige">+ Nova categoria</a>
-    </div>
     <div class="card" style="padding:0">
-        <table><thead><tr><th>ID</th><th>Nome</th><th>Slug</th><th>Status</th><th style="width:180px">Ações</th></tr></thead>
-        <tbody id="tabela"><tr><td colspan="5">Carregando…</td></tr></tbody></table>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Slug</th>
+                    <th>Status</th>
+                    <th style="width:180px">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela">
+                <tr><td colspan="5">Carregando…</td></tr>
+            </tbody>
+        </table>
     </div>
-</main>
 
-<script>
-(async () => {
-    let cats = [];
-    try { cats = await api('/admin/categories'); } catch { return; }
-    const tb = document.getElementById('tabela');
-    if (!cats.length) { tb.innerHTML = '<tr><td colspan="5">Nenhuma</td></tr>'; return; }
-    tb.innerHTML = cats.map(c => `
-        <tr>
-            <td>${c.id}</td><td>${c.nome}</td><td>${c.slug||'-'}</td>
-            <td>${c.ativo!==false ? '<span class="badge badge-green">Ativa</span>' : '<span class="badge badge-gray">Inativa</span>'}</td>
-            <td class="actions">
-                <a href="editar-categoria.html?id=${c.id}" class="btn btn-sm btn-outline">Editar</a>
-                <button class="btn btn-sm btn-danger" onclick="desativar(${c.id})">Desativar</button>
-            </td>
-        </tr>`).join('');
-})();
-async function desativar(id) {
-    if (!confirm('Desativar categoria?')) return;
-    try { await api('/admin/categories/' + id, { method:'DELETE' }); toast('Desativada'); setTimeout(()=>location.reload(),400); } catch {}
-}
-window.desativar = desativar;
-</script>
+    <script>
+    renderLayout({
+        active: 'categorias',
+        title: 'Categorias',
+        actions: '<a href="categoria-form.html" class="btn btn-beige">+ Nova categoria</a>'
+    });
+
+    (async () => {
+        let cats = [];
+        try { cats = await api('/admin/categories'); } catch { return; }
+        const tb = document.getElementById('tabela');
+        if (!cats.length) { tb.innerHTML = '<tr><td colspan="5">Nenhuma categoria encontrada.</td></tr>'; return; }
+        tb.innerHTML = cats.map(c => `
+            <tr>
+                <td>${c.id}</td>
+                <td><b>${c.nome}</b></td>
+                <td>${c.slug || '-'}</td>
+                <td>${c.ativo !== false ? '<span class="badge badge-green">Ativa</span>' : '<span class="badge badge-gray">Inativa</span>'}</td>
+                <td class="actions">
+                    <a href="editar-categoria.html?id=${c.id}" class="btn btn-sm btn-outline">Editar</a>
+                    <button class="btn btn-sm btn-danger" onclick="desativar(${c.id})">Desativar</button>
+                </td>
+            </tr>`).join('');
+    })();
+
+    async function desativar(id) {
+        if (!confirm('Desativar categoria?')) return;
+        try { 
+            await api('/admin/categories/' + id, { method:'DELETE' }); 
+            toast('Desativada'); 
+            setTimeout(() => location.reload(), 400); 
+        } catch {}
+    }
+    window.desativar = desativar;
+    </script>
 </body>
 </html>

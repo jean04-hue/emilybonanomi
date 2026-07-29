@@ -2,116 +2,89 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Detalhes / Editar Cliente</title>
-    <link rel="stylesheet" href="admin.css"> <!-- Seus estilos do admin -->
+    <title>Editar Cliente — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
-    <div class="container">
-        <a href="clientes.html">&larr; Voltar para Clientes</a>
-        <h1 id="tituloCliente">Carregando cliente...</h1>
 
-        <div class="acoes-topo" style="margin-bottom: 20px;">
-            <button id="btnToggleAtivo" class="btn">Carregando...</button>
-            <button id="btnResetSenha" class="btn btn-warning">🔑 Redefinir Senha Temporária</button>
-        </div>
-
-        <!-- BOX SENHA TEMPORÁRIA GERADA -->
-        <div id="boxSenhaGerada" class="card" style="display:none; background: #e8f5e9; border: 1px solid #4caf50; margin-bottom: 20px; padding: 15px;">
-            <h3>🔑 Senha Temporária Gerada!</h3>
-            <p>Copie ou envie esta senha por e-mail para o cliente. Ao fazer login, ele será solicitado a criar uma nova senha.</p>
-            
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                <div style="font-size: 20px; font-weight: bold; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" id="textoSenhaGerada"></div>
-                
-                <!-- BOTÃO COPIAR -->
-                <button type="button" id="btnCopiarSenha" class="btn btn-sm">📋 Copiar Senha</button>
-                
+    <div class="card" style="margin-bottom: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <h2 id="tituloCliente" style="font-size:16px; margin:0;">Carregando cliente...</h2>
+            <div style="display:flex; gap:8px;">
+                <button id="btnToggleAtivo" class="btn btn-sm">Carregando...</button>
+                <button id="btnResetSenha" class="btn btn-sm btn-outline">🔑 Redefinir Senha Temporária</button>
             </div>
-        </div>
-
-        <form id="formCliente">
-            <!-- 👤 DADOS PESSOAIS -->
-            <div class="card" style="margin-bottom: 20px;">
-                <h2>👤 Dados Pessoais</h2>
-                <div class="form-group">
-                    <label>Nome:</label>
-                    <input type="text" id="nome" required>
-                </div>
-                <div class="form-group">
-                    <label>Sobrenome:</label>
-                    <input type="text" id="sobrenome" required>
-                </div>
-                <div class="form-group">
-                    <label>E-mail (Não editável):</label>
-                    <input type="email" id="email" disabled>
-                </div>
-                <div class="form-group">
-                    <label>Telefone:</label>
-                    <input type="text" id="telefone">
-                </div>
-                <div class="form-group">
-                    <label>Status da Senha:</label>
-                    <span id="statusSenha"></span>
-                </div>
-            </div>
-
-            <!-- 📍 ENDEREÇO -->
-            <div class="card" style="margin-bottom: 20px;">
-                <h2>📍 Endereço</h2>
-                <div class="form-group">
-                    <label>CEP:</label>
-                    <input type="text" id="cep" placeholder="00000-000">
-                </div>
-                <div class="form-group">
-                    <label>Logradouro (Rua/Avenida):</label>
-                    <input type="text" id="logradouro">
-                </div>
-                <div class="form-group">
-                    <label>Número:</label>
-                    <input type="text" id="numero">
-                </div>
-                <div class="form-group">
-                    <label>Complemento:</label>
-                    <input type="text" id="complemento">
-                </div>
-                <div class="form-group">
-                    <label>Bairro:</label>
-                    <input type="text" id="bairro">
-                </div>
-                <div class="form-group">
-                    <label>Cidade:</label>
-                    <input type="text" id="cidade">
-                </div>
-                <div class="form-group">
-                    <label>Estado (UF):</label>
-                    <input type="text" id="estado" maxlength="2">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">💾 Salvar Alterações</button>
-        </form>
-
-        <!-- 🛒 HISTÓRICO DE PEDIDOS -->
-        <div class="card" style="margin-top: 20px;">
-            <h2>🛒 Histórico de Pedidos</h2>
-            <div id="resumoPedidos"></div>
-            <table width="100%" border="1" style="margin-top: 10px; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Data</th>
-                        <th>Status</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaPedidos"></tbody>
-            </table>
         </div>
     </div>
 
-    <script src="config.js"></script>
-    <script src="admin.js"></script>
+    <!-- BOX SENHA TEMPORÁRIA GERADA -->
+    <div id="boxSenhaGerada" class="card" style="display:none; background: #fdf8f0; border: 1px solid #d9a57c; margin-bottom: 20px;">
+        <h3 style="font-size:14px; margin-bottom:8px;">🔑 Senha Temporária Gerada!</h3>
+        <p style="font-size:13px; color:#666;">Copie ou envie esta senha para o cliente.</p>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+            <div id="textoSenhaGerada" style="font-size: 18px; font-weight: bold; background: #fff; padding: 8px 12px; border-radius: 4px; border: 1px solid #ccc;"></div>
+            <button type="button" id="btnCopiarSenha" class="btn btn-sm btn-beige">📋 Copiar Senha</button>
+        </div>
+    </div>
+
+    <form id="formCliente">
+        <!-- DADOS PESSOAIS -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h3 style="font-size:15px; margin-bottom:12px;">Dados Pessoais</h3>
+            <div class="form-row">
+                <div><label>Nome:</label><input type="text" id="nome" required></div>
+                <div><label>Sobrenome:</label><input type="text" id="sobrenome" required></div>
+                <div><label>E-mail (Não editável):</label><input type="email" id="email" disabled></div>
+                <div><label>Telefone:</label><input type="text" id="telefone"></div>
+            </div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h3 style="font-size:15px; margin-bottom:12px;">Endereço</h3>
+            <div class="form-row">
+                <div><label>CEP:</label><input type="text" id="cep"></div>
+                <div><label>Logradouro:</label><input type="text" id="logradouro"></div>
+                <div><label>Número:</label><input type="text" id="numero"></div>
+                <div><label>Complemento:</label><input type="text" id="complemento"></div>
+                <div><label>Bairro:</label><input type="text" id="bairro"></div>
+                <div><label>Cidade:</label><input type="text" id="cidade"></div>
+                <div><label>Estado (UF):</label><input type="text" id="estado" maxlength="2"></div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-beige">Salvar Alterações</button>
+    </form>
+
+    <!-- HISTÓRICO DE PEDIDOS -->
+    <div class="card" style="margin-top: 20px;">
+        <h3 style="font-size:15px; margin-bottom:12px;">Histórico de Pedidos</h3>
+        <div id="resumoPedidos" style="margin-bottom:10px; font-size:13px; color:#666;"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaPedidos">
+                <tr><td colspan="4">Carregando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
     <script src="editar-cliente.js"></script>
-    
+    <script>
+    renderLayout({
+        active: 'clientes',
+        title: 'Detalhes / Editar Cliente',
+        actions: '<a href="clientes.html" class="btn btn-outline">← Voltar</a>'
+    });
+    </script>
 </body>
 </html>

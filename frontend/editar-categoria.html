@@ -1,40 +1,62 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><title>Editar categoria</title>
-<link rel="stylesheet" href="admin.css">
-<script src="config.js"></script><script src="admin.js"></script>
+    <meta charset="UTF-8">
+    <title>Editar Categoria — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
-<script>if(!guard()){throw 'x'} sidebar('categorias');</script>
-<main class="main">
-    <div class="topbar"><h1>Editar categoria</h1><a href="categorias.html" class="btn btn-outline">← Voltar</a></div>
-    <form id="form" class="card">
-        <label>Nome</label><input id="nome" required>
-        <label>Slug</label><input id="slug" required>
-        <div style="margin-top:16px"><button class="btn btn-beige">Salvar</button></div>
+    <form id="form" class="card" style="max-width:500px">
+        <div style="margin-bottom:12px">
+            <label>Nome</label>
+            <input id="nome" required>
+        </div>
+        <div style="margin-bottom:12px">
+            <label>Slug</label>
+            <input id="slug" required>
+        </div>
+        <div style="margin-top:16px; display:flex; gap:8px">
+            <button class="btn btn-beige">Salvar Alterações</button>
+            <a href="categorias.html" class="btn btn-outline">Cancelar</a>
+        </div>
     </form>
-</main>
-<script>
-const ID = qs('id');
-(async () => {
-    try {
-        const cats = await api('/admin/categories');
-        const c = cats.find(x => x.id == ID);
-        if (!c) { toast('Não encontrada','error'); return; }
-        document.getElementById('nome').value = c.nome;
-        document.getElementById('slug').value = c.slug || '';
-    } catch {}
-})();
-document.getElementById('form').addEventListener('submit', async e => {
-    e.preventDefault();
-    try {
-        await api('/admin/categories/' + ID, { method:'PUT', body:{
-            nome: document.getElementById('nome').value,
-            slug: document.getElementById('slug').value
-        }});
-        toast('Atualizada'); setTimeout(()=>location.href='categorias.html', 500);
-    } catch {}
-});
-</script>
-</body></html>
+
+    <script>
+    renderLayout({
+        active: 'categorias',
+        title: 'Editar Categoria',
+        actions: '<a href="categorias.html" class="btn btn-outline">← Voltar</a>'
+    });
+
+    const ID = qs('id');
+
+    (async () => {
+        try {
+            const cats = await api('/admin/categories');
+            const c = cats.find(x => x.id == ID);
+            if (!c) { toast('Categoria não encontrada', 'error'); return; }
+            document.getElementById('nome').value = c.nome;
+            document.getElementById('slug').value = c.slug || '';
+        } catch {}
+    })();
+
+    document.getElementById('form').addEventListener('submit', async e => {
+        e.preventDefault();
+        try {
+            await api('/admin/categories/' + ID, { 
+                method: 'PUT', 
+                body: {
+                    nome: document.getElementById('nome').value,
+                    slug: document.getElementById('slug').value
+                }
+            });
+            toast('Categoria atualizada'); 
+            setTimeout(() => location.href = 'categorias.html', 500);
+        } catch {}
+    });
+    </script>
+</body>
+</html>

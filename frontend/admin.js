@@ -1,12 +1,8 @@
-/* Emily_Bonanomi 2.0 - Painel Admin (Fase 5)
-   Core do painel: guard, sidebar, api wrapper, toast, money.
-   Chaves isoladas do site público: eb_admin_token / eb_admin_user
-   Reusa o mesmo endpoint /api/auth/login do backend existente.
-*/
+/* Emily_Bonanomi 2.0 - Core & Template Engine do Painel Admin */
 
 const API_BASE = (window.API_URL || 'http://localhost:3000/api').replace(/\/+$/, '');
 
-// ============ STORAGE ============
+// ============ STORAGE & AUTH ============
 const TOKEN_KEY = 'eb_admin_token';
 const USER_KEY  = 'eb_admin_user';
 
@@ -21,11 +17,9 @@ function clearSession() {
     localStorage.removeItem(USER_KEY);
 }
 
-// ============ GUARD ============
 function guard() {
     const u = getUser();
     const t = getToken();
-    // backend usa tipo_usuario; a spec fala em role. Aceita os dois.
     const role = u && (u.role || u.tipo_usuario);
     if (!t || !u || role !== 'admin') {
         location.replace('login.html');
@@ -34,8 +28,21 @@ function guard() {
     return true;
 }
 
-// ============ SIDEBAR ============
-function sidebar(ativo) {
+function logout() {
+    clearSession();
+    location.href = 'login.html';
+}
+
+// ============ TEMPLATE ENGINE CENTRALIZADO ============
+function renderLayout(options = {}) {
+    if (!guard()) return;
+
+    const activeKey = options.active || '';
+    const title     = options.title || 'Painel Admin';
+    const subtitle  = options.subtitle || '';
+    const actions   = options.actions || ''; // Botões no topo (ex: "+ Novo Produto")
+
+    // Links sem ícones/figurinhas
     const links = [
         { key: 'dashboard',   label: 'Dashboard',  href: 'dashboard.html' },
         { key: 'produtos',    label: 'Produtos',   href: 'produtos.html' },
@@ -45,24 +52,97 @@ function sidebar(ativo) {
         { key: 'clientes',    label: 'Clientes',   href: 'clientes.html' },
         { key: 'avaliacoes',  label: 'Avaliações', href: 'avaliacoes.html' }
     ];
-    const html = `
+
+    // Guarda o conteúdo HTML original escrito dentro da página
+    const pageContent = document.body.innerHTML;
+
+    const user = getUser();
+    const userName = user?.nome || 'Admin';
+
+    // Monta o Layout Mestre sem <span class="nav-icon">
+    const fullLayout = `
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+        <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu">☰</button>
+
         <aside class="sidebar">
             <div class="brand">Emily Admin</div>
             <nav>
-                ${links.map(l =>
-                    `<a href="${l.href}" class="${l.key===ativo?'active':''}"><span>${l.label}</span></a>`
-                ).join('')}
+                ${links.map(l => `
+                    <a href="${l.href}" class="${l.key === activeKey ? 'active' : ''}">
+                        <span>${l.label}</span>
+                    </a>
+                `).join('')}
                 <div class="logout">
-                    <a href="#" onclick="logout();return false;"><span>Sair</span></a>
+                    <a href="#" onclick="logout(); return false;">
+                        <span>Sair</span>
+                    </a>
                 </div>
             </nav>
-        </aside>`;
-    document.body.insertAdjacentHTML('afterbegin', html);
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <h1>${title}</h1>
+                    ${subtitle ? `<div class="sub-greeting">${subtitle}</div>` : ''}
+                </div>
+                <div class="topbar-actions">
+                    ${actions}
+                    <div class="user-badge">Olá, <strong>${userName}</strong></div>
+                </div>
+            </header>
+
+            <section class="page-body">
+                ${pageContent}
+            </section>
+        </main>
+    `;
+
+    // Injeta o novo layout estruturado
+    document.body.innerHTML = fullLayout;
+
+    // Inicializa manipuladores do Menu Mobile
+    initMobileMenu();
 }
 
-function logout() {
-    clearSession();
-    location.href = 'login.html';
+function initMobileMenu() {
+    const menuBtn = document.getElementById("menu-toggle");
+    const sidebarEl = document.querySelector(".sidebar");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    function toggleMenu() {
+        if (!sidebarEl) return;
+        const isOpen = sidebarEl.classList.toggle("open");
+        if (overlay) overlay.classList.toggle("show", isOpen);
+        document.body.classList.toggle("menu-open", isOpen);
+    }
+
+    function closeMenu() {
+        if (!sidebarEl) return;
+        sidebarEl.classList.remove("open");
+        if (overlay) overlay.classList.remove("show");
+        document.body.classList.remove("menu-open");
+    }
+
+    if (menuBtn) {
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+
+    if (overlay) overlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("click", (e) => {
+        if (
+            window.innerWidth <= 768 &&
+            sidebarEl && sidebarEl.classList.contains("open") &&
+            !sidebarEl.contains(e.target) &&
+            e.target !== menuBtn
+        ) {
+            closeMenu();
+        }
+    });
 }
 
 // ============ API WRAPPER ============
@@ -71,7 +151,6 @@ async function api(path, opts = {}) {
     const t = getToken();
     if (t) headers['Authorization'] = 'Bearer ' + t;
 
-    // Só adiciona Content-Type se não for FormData e tiver body
     if (opts.body && !(opts.body instanceof FormData) && !headers['Content-Type']) {
         headers['Content-Type'] = 'application/json';
         if (typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
@@ -94,12 +173,11 @@ async function api(path, opts = {}) {
         toast(msg, 'error');
         throw new Error(msg);
     }
-    // Envelope {success, data} → devolve data. Caso contrário, devolve tudo.
     if (data && typeof data === 'object' && 'success' in data && 'data' in data) return data.data;
     return data;
 }
 
-// ============ TOAST ============
+// ============ UTILS ============
 function toast(msg, tipo = 'success') {
     let box = document.querySelector('.toast-container');
     if (!box) {
@@ -114,16 +192,17 @@ function toast(msg, tipo = 'success') {
     setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3200);
 }
 
-// ============ UTILS ============
 function money(n) {
     const v = Number(n || 0);
     return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
 function dateBR(s) {
     if (!s) return '-';
     const d = new Date(s);
     return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 }
+
 function qs(k) { return new URLSearchParams(location.search).get(k); }
 
 function statusBadge(status) {
@@ -143,9 +222,9 @@ function statusBadge(status) {
     return `<span class="badge ${cls}">${txt}</span>`;
 }
 
-// expor global
+// Exposição Global
 window.guard = guard;
-window.sidebar = sidebar;
+window.renderLayout = renderLayout;
 window.logout = logout;
 window.api = api;
 window.toast = toast;

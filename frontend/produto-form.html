@@ -1,74 +1,78 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Novo produto — Admin</title>
-<link rel="stylesheet" href="admin.css">
-<script src="config.js"></script>
-<script src="admin.js"></script>
+    <meta charset="UTF-8">
+    <title>Novo Produto — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="admin.css">
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
 </head>
 <body>
-<script>if(!guard()){throw 'x'} sidebar('produtos');</script>
-
-<main class="main">
-    <div class="topbar">
-        <h1>Novo produto</h1>
-        <a href="produtos.html" class="btn btn-outline">← Voltar</a>
-    </div>
-
     <form id="form" class="card">
         <div class="form-row">
             <div><label>SKU</label><input id="sku" required></div>
-            <div><label>Slug (url amigável)</label><input id="slug" required></div>
+            <div><label>Slug (URL amigável)</label><input id="slug" required></div>
             <div><label>Nome</label><input id="nome" required></div>
             <div><label>Marca</label><input id="marca"></div>
             <div><label>Preço (R$)</label><input id="preco" type="number" step="0.01" required></div>
-            <div><label>Preço promocional (R$)</label><input id="preco_promocional" type="number" step="0.01"></div>
+            <div><label>Preço Promocional (R$)</label><input id="preco_promocional" type="number" step="0.01"></div>
             <div><label>Categoria</label><select id="categoria" required></select></div>
         </div>
-        <label>Descrição</label>
-        <textarea id="descricao"></textarea>
-        <label>Tabela de medidas (texto livre)</label>
-        <textarea id="tabela_medidas" placeholder="Ex: P: busto 84cm / M: 90cm / G: 96cm"></textarea>
+        
+        <div style="margin-top:12px;">
+            <label>Descrição</label>
+            <textarea id="descricao" rows="4"></textarea>
+        </div>
 
-        <div style="margin-top:20px;display:flex;gap:8px">
+        <div style="margin-top:12px;">
+            <label>Tabela de medidas (texto livre)</label>
+            <textarea id="tabela_medidas" rows="3" placeholder="Ex: P: busto 84cm / M: 90cm / G: 96cm"></textarea>
+        </div>
+
+        <p style="color:#7a7268; font-size:12px; margin-top:16px">Após salvar, você poderá adicionar imagens e variações (cor/tamanho/estoque).</p>
+
+        <div style="margin-top:20px; display:flex; gap:8px">
             <button type="submit" class="btn btn-beige">Salvar produto</button>
             <a href="produtos.html" class="btn btn-outline">Cancelar</a>
         </div>
     </form>
 
-    <p style="color:#7a7268;font-size:12px;margin-top:12px">Após salvar você poderá adicionar imagens e variações (cor/tamanho/estoque).</p>
-</main>
+    <script>
+    renderLayout({
+        active: 'produtos',
+        title: 'Novo Produto',
+        actions: '<a href="produtos.html" class="btn btn-outline">← Voltar</a>'
+    });
 
-<script>
-(async () => {
-    try {
-        const cats = await api('/admin/categories');
-        document.getElementById('categoria').innerHTML =
-            '<option value="">— selecione —</option>' +
-            cats.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
-    } catch {}
-})();
+    (async () => {
+        try {
+            const cats = await api('/admin/categories');
+            document.getElementById('categoria').innerHTML =
+                '<option value="">— selecione —</option>' +
+                cats.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+        } catch {}
+    })();
 
-document.getElementById('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const body = {
-        sku:  document.getElementById('sku').value.trim(),
-        slug: document.getElementById('slug').value.trim(),
-        nome: document.getElementById('nome').value.trim(),
-        marca: document.getElementById('marca').value.trim(),
-        descricao: document.getElementById('descricao').value,
-        preco: parseFloat(document.getElementById('preco').value),
-        preco_promocional: parseFloat(document.getElementById('preco_promocional').value) || null,
-        tabela_medidas: document.getElementById('tabela_medidas').value,
-        categoria_id: parseInt(document.getElementById('categoria').value, 10)
-    };
-    try {
-        const p = await api('/admin/products', { method: 'POST', body });
-        toast('Produto criado');
-        setTimeout(() => location.href = 'editar-produto.html?id=' + (p.id || p.produto?.id), 500);
-    } catch {}
-});
-</script>
+    document.getElementById('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const body = {
+            sku: document.getElementById('sku').value.trim(),
+            slug: document.getElementById('slug').value.trim(),
+            nome: document.getElementById('nome').value.trim(),
+            marca: document.getElementById('marca').value.trim(),
+            descricao: document.getElementById('descricao').value,
+            preco: parseFloat(document.getElementById('preco').value),
+            preco_promocional: parseFloat(document.getElementById('preco_promocional').value) || null,
+            tabela_medidas: document.getElementById('tabela_medidas').value,
+            categoria_id: parseInt(document.getElementById('categoria').value, 10)
+        };
+        try {
+            const p = await api('/admin/products', { method: 'POST', body });
+            toast('Produto criado com sucesso');
+            setTimeout(() => location.href = 'editar-produto.html?id=' + (p.id || p.produto?.id), 500);
+        } catch {}
+    });
+    </script>
 </body>
 </html>
