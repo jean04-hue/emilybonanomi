@@ -204,7 +204,7 @@ await emailService.enviarEmailRedefinicaoSenha({
     to: usuario.email,
     nome: usuario.nome,
     senhaTemporaria: senha,
-    linkLoja: process.env.FRONTEND_LOGIN_URL
+    linkLoja: `${process.env.FRONTEND_LOJA_URL}/login.html`
 });
 
         }
