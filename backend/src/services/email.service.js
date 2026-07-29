@@ -1,45 +1,15 @@
-console.log('SMTP_HOST:', process.env.SMTP_HOST);
-console.log('SMTP_PORT:', process.env.SMTP_PORT);
-console.log('SMTP_USER:', process.env.SMTP_USER);
-console.log('SMTP_PASS:', process.env.SMTP_PASS ? 'OK' : 'VAZIO');
+const { Resend } = require("resend");
 
-const nodemailer = require('nodemailer');
+if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY não configurada.");
+}
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    family: 4,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const dns = require("dns");
-
-dns.lookup(process.env.SMTP_HOST, { family: 4 }, (err, address) => {
-    console.log("DNS:", err, address);
-});
-
-const net = require("net");
-
-const socket = net.createConnection(
-    Number(process.env.SMTP_PORT),
-    process.env.SMTP_HOST
+console.log(
+    "RESEND_API_KEY:",
+    process.env.RESEND_API_KEY ? "OK" : "VAZIA"
 );
-
-socket.on("connect", () => {
-    console.log(`PORTA ${process.env.SMTP_PORT} OK`);
-    socket.destroy();
-});
-
-socket.on("error", (err) => {
-    console.log("ERRO TCP:", err);
-});
 
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
     const htmlContent = `
@@ -266,22 +236,22 @@ Todos os direitos reservados.
 
     try {
 
-    const info = await transporter.sendMail({
+    const { data, error } = await resend.emails.send({
+    from: "Emily Bonanomi <onboarding@resend.dev>",
+    to,
+    subject: "🔑 Sua senha temporária de acesso - Emily Bonanomi",
+html: htmlContent
+});
 
-        from: process.env.SMTP_USER,
-
-        to,
-
-        subject: '🔑 Sua senha temporária de acesso - Emily Bonanomi',
-
-        html: htmlContent
-
-    });
+if (error) {
+    console.error(error);
+    throw new Error(error.message);
+}
 
     console.log("EMAIL TEMPORÁRIO ENVIADO");
-    console.log(info);
+    console.log(data);
 
-    return info;
+    return data;
 
 } catch(err){
 
@@ -482,22 +452,22 @@ Todos os direitos reservados.
 
     try {
 
-    const info = await transporter.sendMail({
+    const { data, error } = await resend.emails.send({
+    from: process.env.RESEND_FROM || "Emily Bonanomi <onboarding@resend.dev>",
+    to,
+    subject: "🔐 Recuperação de senha - Emily Bonanomi",
+html: htmlContent
+});
 
-        from: process.env.SMTP_USER,
-
-        to,
-
-        subject: '🔐 Recuperação de senha - Emily Bonanomi',
-
-        html: htmlContent
-
-    });
+if (error) {
+    console.error(error);
+    throw new Error(error.message);
+}
 
     console.log("EMAIL ENVIADO");
-    console.log(info);
+    console.log(data);
 
-    return info;
+    return data;
 
 } catch(err){
 
@@ -509,20 +479,6 @@ Todos os direitos reservados.
 
 }
 
-transporter.verify(function (error, success) {
-
-    if (error) {
-
-        console.error('SMTP NÃO CONECTOU');
-        console.error(error);
-
-    } else {
-
-        console.log('SMTP CONECTADO COM SUCESSO');
-
-    }
-
-});
 
 module.exports = {
     enviarEmailRedefinicaoSenha,
