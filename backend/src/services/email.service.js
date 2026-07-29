@@ -1,7 +1,9 @@
 const brevo = require("@getbrevo/brevo");
 
+// 1. Instanciar a API do Brevo corretamente
 const apiInstance = new brevo.TransactionalEmailsApi();
 
+// 2. Configurar a chave de API usando a propriedade de autenticação
 apiInstance.setApiKey(
     brevo.TransactionalEmailsApiApiKeys.apiKey,
     process.env.BREVO_API_KEY
@@ -236,46 +238,27 @@ Todos os direitos reservados.
 `;
 
     try {
+        const sendSmtpEmail = new brevo.SendSmtpEmail();
+        sendSmtpEmail.sender = {
+            name: "Emily Bonanomi",
+            email: "financeiro.neiderjean@gmail.com"
+        };
+        sendSmtpEmail.to = [{ email: to, name: nome }];
+        sendSmtpEmail.subject = "🔑 Sua senha temporária - Emily Bonanomi";
+        sendSmtpEmail.htmlContent = htmlContent;
 
-    const data = await apiInstance.sendTransacEmail({
-    sender: {
-        name: "Emily Bonanomi",
-        email: "financeiro.neiderjean@gmail.com"
-    },
-    to: [
-        {
-            email: to,
-            name: nome
-        }
-    ],
-    subject: "🔑 Sua senha temporária - Emily Bonanomi",
-    htmlContent
-});
+        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
 
-console.log(data);
+        console.log("EMAIL TEMPORÁRIO ENVIADO:", data);
+        return data;
 
-return data;
-
-} catch(err){
-
-    console.error("ERRO EMAIL TEMPORÁRIO");
-    console.error(err);
-
-    throw err;
-
-}
+    } catch (err) {
+        console.error("ERRO EMAIL TEMPORÁRIO:", err);
+        throw err;
+    }
 }
 
-async function enviarEmailRecuperacao({
-
-    to,
-
-    nome,
-
-    link
-
-}) {
-
+async function enviarEmailRecuperacao({ to, nome, link }) {
     const htmlContent = `
 <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
 
@@ -454,39 +437,25 @@ Todos os direitos reservados.
 `;
 
     try {
-
-    await apiInstance.sendTransacEmail({
-
-        sender: {
+        const sendSmtpEmail = new brevo.SendSmtpEmail();
+        sendSmtpEmail.sender = {
             name: "Emily Bonanomi",
             email: "financeiro.neiderjean@gmail.com"
-        },
+        };
+        sendSmtpEmail.to = [{ email: to, name: nome }];
+        sendSmtpEmail.subject = "🔐 Recuperação de senha - Emily Bonanomi";
+        sendSmtpEmail.htmlContent = htmlContent;
 
-        to: [
-            {
-                email: to,
-                name: nome
-            }
-        ],
+        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
 
-        subject: "🔐 Recuperação de senha - Emily Bonanomi",
+        console.log("EMAIL RECUPERAÇÃO ENVIADO:", data);
+        return data;
 
-        htmlContent
-
-    });
-
-    console.log("EMAIL ENVIADO");
-
-} catch (err) {
-
-    console.error(err);
-
-    throw err;
-
+    } catch (err) {
+        console.error("ERRO EMAIL RECUPERAÇÃO:", err);
+        throw err;
+    }
 }
-
-}
-
 
 module.exports = {
     enviarEmailRedefinicaoSenha,
