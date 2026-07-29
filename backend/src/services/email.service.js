@@ -1,11 +1,10 @@
-const brevo = require("@getbrevo/brevo");
+const Brevo = require("@getbrevo/brevo");
 
-// 1. Instanciar a API do Brevo corretamente
-const apiInstance = new brevo.TransactionalEmailsApi();
+const apiInstance = new Brevo.TransactionalEmailsApi();
 
-// 2. Configurar a chave de API usando a propriedade de autenticação
+// Na versão 6.x do SDK do Brevo, a chave de API é configurada assim:
 apiInstance.setApiKey(
-    brevo.TransactionalEmailsApiApiKeys.apiKey,
+    Brevo.TransactionalEmailsApiApiKeys.apiKey,
     process.env.BREVO_API_KEY
 );
 
@@ -238,27 +237,46 @@ Todos os direitos reservados.
 `;
 
     try {
-        const sendSmtpEmail = new brevo.SendSmtpEmail();
-        sendSmtpEmail.sender = {
-            name: "Emily Bonanomi",
-            email: "financeiro.neiderjean@gmail.com"
-        };
-        sendSmtpEmail.to = [{ email: to, name: nome }];
-        sendSmtpEmail.subject = "🔑 Sua senha temporária - Emily Bonanomi";
-        sendSmtpEmail.htmlContent = htmlContent;
 
-        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    const data = await apiInstance.sendTransacEmail({
+    sender: {
+        name: "Emily Bonanomi",
+        email: "financeiro.neiderjean@gmail.com"
+    },
+    to: [
+        {
+            email: to,
+            name: nome
+        }
+    ],
+    subject: "🔑 Sua senha temporária - Emily Bonanomi",
+    htmlContent
+});
 
-        console.log("EMAIL TEMPORÁRIO ENVIADO:", data);
-        return data;
+console.log(data);
 
-    } catch (err) {
-        console.error("ERRO EMAIL TEMPORÁRIO:", err);
-        throw err;
-    }
+return data;
+
+} catch(err){
+
+    console.error("ERRO EMAIL TEMPORÁRIO");
+    console.error(err);
+
+    throw err;
+
+}
 }
 
-async function enviarEmailRecuperacao({ to, nome, link }) {
+async function enviarEmailRecuperacao({
+
+    to,
+
+    nome,
+
+    link
+
+}) {
+
     const htmlContent = `
 <div style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
 
@@ -437,25 +455,39 @@ Todos os direitos reservados.
 `;
 
     try {
-        const sendSmtpEmail = new brevo.SendSmtpEmail();
-        sendSmtpEmail.sender = {
+
+    await apiInstance.sendTransacEmail({
+
+        sender: {
             name: "Emily Bonanomi",
             email: "financeiro.neiderjean@gmail.com"
-        };
-        sendSmtpEmail.to = [{ email: to, name: nome }];
-        sendSmtpEmail.subject = "🔐 Recuperação de senha - Emily Bonanomi";
-        sendSmtpEmail.htmlContent = htmlContent;
+        },
 
-        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        to: [
+            {
+                email: to,
+                name: nome
+            }
+        ],
 
-        console.log("EMAIL RECUPERAÇÃO ENVIADO:", data);
-        return data;
+        subject: "🔐 Recuperação de senha - Emily Bonanomi",
 
-    } catch (err) {
-        console.error("ERRO EMAIL RECUPERAÇÃO:", err);
-        throw err;
-    }
+        htmlContent
+
+    });
+
+    console.log("EMAIL ENVIADO");
+
+} catch (err) {
+
+    console.error(err);
+
+    throw err;
+
 }
+
+}
+
 
 module.exports = {
     enviarEmailRedefinicaoSenha,
