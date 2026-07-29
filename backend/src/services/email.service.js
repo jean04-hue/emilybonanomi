@@ -1,14 +1,15 @@
-const { Resend } = require("resend");
+const brevo = require("@getbrevo/brevo");
 
-if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY não configurada.");
-}
+const apiInstance = new brevo.TransactionalEmailsApi();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+apiInstance.setApiKey(
+    brevo.TransactionalEmailsApiApiKeys.apiKey,
+    process.env.BREVO_API_KEY
+);
 
 console.log(
-    "RESEND_API_KEY:",
-    process.env.RESEND_API_KEY ? "OK" : "VAZIA"
+    "BREVO_API_KEY:",
+    process.env.BREVO_API_KEY ? "OK" : "VAZIA"
 );
 
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
@@ -236,22 +237,24 @@ Todos os direitos reservados.
 
     try {
 
-    const { data, error } = await resend.emails.send({
-    from: "Emily Bonanomi <onboarding@resend.dev>",
-    to,
-    subject: "🔑 Sua senha temporária de acesso - Emily Bonanomi",
-html: htmlContent
+    const data = await apiInstance.sendTransacEmail({
+    sender: {
+        name: "Emily Bonanomi",
+        email: "financeiro.neiderjean@gmail.com"
+    },
+    to: [
+        {
+            email: to,
+            name: nome
+        }
+    ],
+    subject: "🔑 Sua senha temporária - Emily Bonanomi",
+    htmlContent
 });
 
-if (error) {
-    console.error(error);
-    throw new Error(error.message);
-}
+console.log(data);
 
-    console.log("EMAIL TEMPORÁRIO ENVIADO");
-    console.log(data);
-
-    return data;
+return data;
 
 } catch(err){
 
@@ -452,29 +455,34 @@ Todos os direitos reservados.
 
     try {
 
-    const { data, error } = await resend.emails.send({
-    from: process.env.RESEND_FROM || "Emily Bonanomi <onboarding@resend.dev>",
-    to,
-    subject: "🔐 Recuperação de senha - Emily Bonanomi",
-html: htmlContent
-});
+    await apiInstance.sendTransacEmail({
 
-if (error) {
-    console.error(error);
-    throw new Error(error.message);
-}
+        sender: {
+            name: "Emily Bonanomi",
+            email: "financeiro.neiderjean@gmail.com"
+        },
+
+        to: [
+            {
+                email: to,
+                name: nome
+            }
+        ],
+
+        subject: "🔐 Recuperação de senha - Emily Bonanomi",
+
+        htmlContent
+
+    });
 
     console.log("EMAIL ENVIADO");
-    console.log(data);
 
-    return data;
+} catch (err) {
 
-} catch(err){
-
-    console.error("ERRO SENDMAIL");
     console.error(err);
 
     throw err;
+
 }
 
 }
