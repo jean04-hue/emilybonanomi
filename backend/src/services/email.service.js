@@ -3,9 +3,9 @@ const Brevo = require("@getbrevo/brevo");
 // 1. Instancia a API de e-mails transacionais
 const apiInstance = new Brevo.TransactionalEmailsApi();
 
-// 2. Configura a chave de API (0 representa o enum da chave no SDK v6)
+// 2. Configura a chave de API na instância da API (Formato oficial v6)
 if (process.env.BREVO_API_KEY) {
-    apiInstance.setApiKey(0, process.env.BREVO_API_KEY);
+    apiInstance.authentications['apiKey'].apiKey = process.env.BREVO_API_KEY;
 }
 
 console.log(
