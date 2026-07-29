@@ -1,17 +1,4 @@
-const Brevo = require("@getbrevo/brevo");
-
-// 1. Instancia a API de e-mails transacionais
-const apiInstance = new Brevo.TransactionalEmailsApi();
-
-// 2. Configura a chave de API na instância da API (Formato oficial v6)
-if (process.env.BREVO_API_KEY) {
-    apiInstance.authentications['apiKey'].apiKey = process.env.BREVO_API_KEY;
-}
-
-console.log(
-    "BREVO_API_KEY:",
-    process.env.BREVO_API_KEY ? "OK" : "VAZIA"
-);
+// Usamos a API REST do Brevo diretamente via fetch (Sem erro de SDK!)
 
 async function enviarEmailRedefinicaoSenha({ to, nome, senhaTemporaria, linkLoja }) {
     const htmlContent = `
@@ -78,14 +65,28 @@ Este é um e-mail automático da <strong>Emily Bonanomi</strong>.<br>Por favor, 
 `;
 
     try {
-        const sendSmtpEmail = new Brevo.SendSmtpEmail();
-        sendSmtpEmail.sender = { name: "Emily Bonanomi", email: "financeiro.neiderjean@gmail.com" };
-        sendSmtpEmail.to = [{ email: to, name: nome }];
-        sendSmtpEmail.subject = "🔑 Sua senha temporária - Emily Bonanomi";
-        sendSmtpEmail.htmlContent = htmlContent;
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+                "accept": "application/json",
+                "api-key": process.env.BREVO_API_KEY,
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                sender: { name: "Emily Bonanomi", email: "financeiro.neiderjean@gmail.com" },
+                to: [{ email: to, name: nome }],
+                subject: "🔑 Sua senha temporária - Emily Bonanomi",
+                htmlContent
+            })
+        });
 
-        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log("EMAIL TEMPORÁRIO ENVIADO COM SUCESSO:", data);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Erro Brevo HTTP ${response.status}: ${JSON.stringify(data)}`);
+        }
+
+        console.log("EMAIL TEMPORÁRIO ENVIADO VIA BREVO:", data);
         return data;
 
     } catch (err) {
@@ -150,14 +151,28 @@ Este é um e-mail automático da <strong>Emily Bonanomi</strong>.<br>Por favor, 
 `;
 
     try {
-        const sendSmtpEmail = new Brevo.SendSmtpEmail();
-        sendSmtpEmail.sender = { name: "Emily Bonanomi", email: "financeiro.neiderjean@gmail.com" };
-        sendSmtpEmail.to = [{ email: to, name: nome }];
-        sendSmtpEmail.subject = "🔐 Recuperação de senha - Emily Bonanomi";
-        sendSmtpEmail.htmlContent = htmlContent;
+        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+                "accept": "application/json",
+                "api-key": process.env.BREVO_API_KEY,
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                sender: { name: "Emily Bonanomi", email: "financeiro.neiderjean@gmail.com" },
+                to: [{ email: to, name: nome }],
+                subject: "🔐 Recuperação de senha - Emily Bonanomi",
+                htmlContent
+            })
+        });
 
-        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log("EMAIL RECUPERAÇÃO ENVIADO COM SUCESSO:", data);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Erro Brevo HTTP ${response.status}: ${JSON.stringify(data)}`);
+        }
+
+        console.log("EMAIL RECUPERAÇÃO ENVIADO VIA BREVO:", data);
         return data;
 
     } catch (err) {
